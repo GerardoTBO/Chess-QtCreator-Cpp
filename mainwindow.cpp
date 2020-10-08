@@ -11,9 +11,15 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    /*
+    QPalette pal= button.palette();
+    pal.setColor(QPalette::Window, QColor(255, 0, 0));
+    pal.setColor(QPalette::Button, QColor(0x00, 0x00, 0xff));
+    pal.setColor(QPalette::ButtonText, QColor(Qt::yellow));
+    */
     QPushButton* casillas[8][8];
-    for(int i=0;i<8;i++){
+    bool isBlack=true;
+    for(int i=0;i<8;i++){  
         for(int j=0;j<8;j++){
             string temp;
             switch(j)
@@ -36,7 +42,17 @@ MainWindow::MainWindow(QWidget *parent)
                 break;
             }
             casillas[i][j]=new QPushButton(temp.c_str());
-            casillas[i][j]->setGeometry(0,0,50,50);
+
+            if(isBlack){
+                casillas[i][j]->setStyleSheet("background-color: #D7911E;" "width: 60px;" "height:60px");
+            }
+            else{
+                casillas[i][j]->setStyleSheet("background-color: #FCD28B;" "width: 60px;" "height:60px");
+            }
+            if(j!=7){
+                isBlack=!isBlack;
+            }
+
             ui->gridLayout->addWidget(casillas[i][j],9-i,j);
         }
     }
