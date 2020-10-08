@@ -62,6 +62,8 @@ MainWindow::MainWindow(QWidget *parent)
             // 10. casillas[i][j]->setStyleSheet("background-color: #A65B51;" "width: 60px;" "height:60px");
             // 11. casillas[i][j]->setStyleSheet("background-color: #BC5351;" "width: 60px;" "height:60px");
             // 11. casillas[i][j]->setStyleSheet("background-color: #C1C2EE;" "width: 60px;" "height:60px");
+            // 12. casillas[i][j]->setStyleSheet("background-color: #6F809E;" "width: 60px;" "height:60px");
+            // 12. casillas[i][j]->setStyleSheet("background-color: #D2CDB9;" "width: 60px;" "height:60px");
             if(isBlack){
                 casillas[i][j]->setStyleSheet("background-color: #BC5351;" "width: 60px;" "height:60px");
             }
