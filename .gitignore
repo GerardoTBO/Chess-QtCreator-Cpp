@@ -71,3 +71,7 @@ Thumbs.db
 *.dll
 *.exe
 
+# My files
+CMakeLists.txt
+CMakeLists.txt.user
+

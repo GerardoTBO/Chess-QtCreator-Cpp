@@ -42,12 +42,31 @@ MainWindow::MainWindow(QWidget *parent)
                 break;
             }
             casillas[i][j]=new QPushButton(temp.c_str());
-
+            // 2. casillas[i][j]->setStyleSheet("background-color: #554D44;" "width: 60px;" "height:60px");
+            // 2. casillas[i][j]->setStyleSheet("background-color: #EAB467;" "width: 60px;" "height:60px");
+            // 3. casillas[i][j]->setStyleSheet("background-color: #362523;" "width: 60px;" "height:60px");
+            // 3. casillas[i][j]->setStyleSheet("background-color: #EECEB2;" "width: 60px;" "height:60px");
+            // 4. casillas[i][j]->setStyleSheet("background-color: #3B3B3B;" "width: 60px;" "height:60px");
+            // 4. casillas[i][j]->setStyleSheet("background-color: #DADFDF;" "width: 60px;" "height:60px");
+            // 5. casillas[i][j]->setStyleSheet("background-color: #8D8C9A;" "width: 60px;" "height:60px");
+            // 5. casillas[i][j]->setStyleSheet("background-color: #D7D5E1;" "width: 60px;" "height:60px");
+            // 6. casillas[i][j]->setStyleSheet("background-color: #7794A9;" "width: 60px;" "height:60px");
+            // 6. casillas[i][j]->setStyleSheet("background-color: #D63E12;" "width: 60px;" "height:60px");
+            // 7. casillas[i][j]->setStyleSheet("background-color: #4B443B;" "width: 60px;" "height:60px");
+            // 7. casillas[i][j]->setStyleSheet("background-color: #FBF5EC;" "width: 60px;" "height:60px");
+            // 8. casillas[i][j]->setStyleSheet("background-color: #454831;" "width: 60px;" "height:60px");
+            // 8. casillas[i][j]->setStyleSheet("background-color: #D2B089;" "width: 60px;" "height:60px");
+            // 9. casillas[i][j]->setStyleSheet("background-color: #252A28;" "width: 60px;" "height:60px");
+            // 9. casillas[i][j]->setStyleSheet("background-color: #6C8381;" "width: 60px;" "height:60px");
+            // 10. casillas[i][j]->setStyleSheet("background-color: #626364;" "width: 60px;" "height:60px");
+            // 10. casillas[i][j]->setStyleSheet("background-color: #A65B51;" "width: 60px;" "height:60px");
+            // 11. casillas[i][j]->setStyleSheet("background-color: #BC5351;" "width: 60px;" "height:60px");
+            // 11. casillas[i][j]->setStyleSheet("background-color: #C1C2EE;" "width: 60px;" "height:60px");
             if(isBlack){
-                casillas[i][j]->setStyleSheet("background-color: #D7911E;" "width: 60px;" "height:60px");
+                casillas[i][j]->setStyleSheet("background-color: #BC5351;" "width: 60px;" "height:60px");
             }
             else{
-                casillas[i][j]->setStyleSheet("background-color: #FCD28B;" "width: 60px;" "height:60px");
+                casillas[i][j]->setStyleSheet("background-color: #C1C2EE;" "width: 60px;" "height:60px");
             }
             if(j!=7){
                 isBlack=!isBlack;
