@@ -72,7 +72,6 @@ Thumbs.db
 *.exe
 
 # My files
-# --------
-.gitignore
-CMakeLists.txt
-CMakeLists.txt.user
+# ------
+*.txt
+*.user
