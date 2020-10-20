@@ -65,10 +65,10 @@ MainWindow::MainWindow(QWidget *parent)
             // 12. casillas[i][j]->setStyleSheet("background-color: #6F809E;" "width: 60px;" "height:60px");
             // 12. casillas[i][j]->setStyleSheet("background-color: #D2CDB9;" "width: 60px;" "height:60px");
             if(isBlack){
-                casillas[i][j]->setStyleSheet("background-color: #BC5351;" "width: 60px;" "height:60px");
+                casillas[i][j]->setStyleSheet("background-color: #540C0B;" "width: 60px;" "height:60px");
             }
             else{
-                casillas[i][j]->setStyleSheet("background-color: #C1C2EE;" "width: 60px;" "height:60px");
+                casillas[i][j]->setStyleSheet("background-color: #DFB082;" "width: 60px;" "height:60px");
             }
             if(j!=7){
                 isBlack=!isBlack;

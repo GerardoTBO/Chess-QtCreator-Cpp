@@ -3,7 +3,8 @@
 - Gerardo Portocarrero Banda
 - Luis Armando Gomez Pomari
 
-## Primer Avance
+## Primer Vista
 ![alt tag](docs/1erAvance.jpg)
 
-
+## Segunda Vista
+![alt tag](docs/2doAvance.png)

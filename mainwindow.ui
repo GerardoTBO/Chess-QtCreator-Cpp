@@ -14,7 +14,7 @@
    <string>Tablero</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #1565C0, stop:1 #b92b27);</string>
+   <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #540C0B, stop:1 #DFB082);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="gridLayoutWidget">
@@ -62,7 +62,7 @@
     <property name="styleSheet">
      <string notr="true">color: rgb(255,255,255);
 font: 75 11pt &quot;DejaVu Sans&quot;;
-background-color: #7E405E;</string>
+background-color: rgb(223,176,130,0.5);</string>
     </property>
     <property name="text">
      <string>Jugador Blanco</string>
@@ -91,7 +91,7 @@ background-color: #7E405E;</string>
     </property>
     <property name="styleSheet">
      <string notr="true">color: rgb(0, 0, 0);
-background-color: #455493;
+background-color: rgb(84,12,11,0.5);
 font: 75 11pt &quot;DejaVu Sans&quot;;</string>
     </property>
     <property name="text">
