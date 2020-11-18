@@ -11,7 +11,7 @@ class King : public Piece {
 
     public:
         King();
-        King(int, int);
+        King(int,int,QString,QString,QString,bool);
         void wherePiece();
 };
 

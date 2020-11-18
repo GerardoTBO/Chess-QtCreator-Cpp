@@ -50,47 +50,36 @@ void MainWindow::createPiece(int x,int y,bool isBlack,QString tipo, QString colo
 
     //Creacion de Ficha de algun tipo y asignacion de icono
     if(tipo.compare("piece")==0){
-        casillas[x][y] = new Piece();
+        casillas[x][y] = new Piece("",color,tipo,isBlack);
     }
     else if(tipo.compare("pawn")==0){
-        casillas[x][y] = new Pawn(x,y);
-        casillas[x][y]->dir_image= "://pieces/"+color+"-pawn.png";
+        casillas[x][y] = new Pawn(x,y,"://pieces/"+color+"-pawn.png",color,tipo,isBlack);
     }
     else if(tipo.compare("bishop")==0){
-        casillas[x][y] = new Bishop(x,y);
-        casillas[x][y]->dir_image= "://pieces/"+color+"-bishop.png";
+        casillas[x][y] = new Bishop(x,y,"://pieces/"+color+"-bishop.png",color,tipo,isBlack);
     }
     else if(tipo.compare("horse")==0){
-        casillas[x][y] = new Horse(x,y);
-        casillas[x][y]->dir_image= "://pieces/"+color+"-horse.png";
+        casillas[x][y] = new Horse(x,y,"://pieces/"+color+"-horse.png",color,tipo,isBlack);
     }
     else if(tipo.compare("tower")==0){
-        casillas[x][y] = new Rook(x,y);
-        casillas[x][y]->dir_image= "://pieces/"+color+"-tower.png";
+        casillas[x][y] = new Rook(x,y,"://pieces/"+color+"-tower.png",color,tipo,isBlack);
     }
     else if(tipo.compare("queen")==0){
-        casillas[x][y] = new Queen(x,y);
-        casillas[x][y]->dir_image= "://pieces/"+color+"-queen.png";
+        casillas[x][y] = new Queen(x,y,"://pieces/"+color+"-queen.png",color,tipo,isBlack);
     }
     else if(tipo.compare("king")==0){
-        casillas[x][y] = new King(x,y);
-        casillas[x][y]->dir_image= "://pieces/"+color+"-king.png";
+        casillas[x][y] = new King(x,y,"://pieces/"+color+"-king.png",color,tipo,isBlack);
     }
-    casillas[x][y]->piece_color = color;
-    casillas[x][y]->class_name = tipo;
     casillas[x][y]->setIcon(QIcon(casillas[x][y]->dir_image));
     casillas[x][y]->setIconSize(QSize(40,40));
 
     //    QString temp = QString::number(x) + " " + QString::number(y);
     //    casillas[x][y]->setText(temp);
 
-    //Color del casillleros
-    if(isBlack){
-        casillas[x][y]->setStyleSheet("background-color: #D7911E;" "width: 60px;" "height:60px");
-    }
-    else{
-        casillas[x][y]->setStyleSheet("background-color: #FCD28B;" "width: 60px;" "height:60px");
-    }
+    //Color del casilllero
+    assingColorBackground(x,y,isBlack);
+
+    //Agregar elementos a gridlayout
     ui->gridLayout->addWidget(casillas[x][y],7-x,y);
 
     //Coneccion de eventos a Piece's
@@ -103,11 +92,23 @@ void MainWindow::movePiece(int c){
     int x = c/10;
     int y = c%10;
 
+    //Selecciona ficha a mover
     if(casillas[x][y]->class_name.compare("")!=0 && ((casillas[x][y]->piece_color.compare("white")==0 && turn%2==1) || (casillas[x][y]->piece_color.compare("black")==0 && turn%2==0)) && posiciones[0]==-1 && posiciones[1]==-1){
         posiciones[0]=x;
         posiciones[1]=y;
         //Calcula las coordenadas donde se puede mover
         casillas[x][y]->wherePiece();
+        changeBackground(x,y);
+    }
+
+    //Cambia de ficha a mover
+    else if(posiciones[0]!=-1 && posiciones[1]!=-1 && casillas[x][y]->piece_color.compare(casillas[posiciones[0]][posiciones[1]]->piece_color)==0){
+        restartBackground(posiciones[0],posiciones[1]);
+        posiciones[0]=x;
+        posiciones[1]=y;
+        //Calcula las coordenadas donde se puede mover
+        casillas[x][y]->wherePiece();
+        changeBackground(x,y);
     }
     else if(posiciones[0]!=-1 && posiciones[1]!=-1){
         bool move_accept=false;
@@ -120,22 +121,40 @@ void MainWindow::movePiece(int c){
 
         //Realiza el movimiento
         if(move_accept){
-            //Falta guardar datos, crear nuevas casillas al mover, y eliminar la permutacion
-
-            //Permutacion de dir_imagen
-            QString dir_temp = casillas[x][y]->dir_image;
-            casillas[x][y]->dir_image = casillas[posiciones[0]][posiciones[1]]->dir_image;
-            casillas[posiciones[0]][posiciones[1]]->dir_image = dir_temp;
-
-            //Actualizacion de Iconos
-            casillas[x][y]->setIcon(QIcon(casillas[x][y]->dir_image));
-            casillas[posiciones[0]][posiciones[1]]->setIcon(QIcon(casillas[posiciones[0]][posiciones[1]]->dir_image));
-
+            //Limpia los background
+            restartBackground(posiciones[0],posiciones[1]);
+            //Mueve la pieza a la nueva casilla
+            createPiece(x,y,casillas[x][y]->background_color,casillas[posiciones[0]][posiciones[1]]->class_name,casillas[posiciones[0]][posiciones[1]]->piece_color);
+            //Limpia la anterior casillas
+            createPiece(posiciones[0],posiciones[1],casillas[posiciones[0]][posiciones[1]]->background_color,"piece","");
             //Reinicio de posiciones guardadas y aumento de contador de turnos
             posiciones[0] = -1;
             posiciones[1] = -1;
             turn++;
         }
+    }
+}
+
+void MainWindow::changeBackground(int x,int y){
+    casillas[x][y]->setStyleSheet("background-color: #7E3B3A;" "width: 60px;" "height:60px");
+    for(std::size_t i=0;i<casillas[x][y]->fs.size();i++) {
+        casillas[casillas[x][y]->fs[i].int_x][casillas[x][y]->fs[i].int_y]->setStyleSheet("background-color: #C48E8D;" "width: 60px;" "height:60px");
+    }
+}
+
+void MainWindow::restartBackground(int x,int y){
+    assingColorBackground(x,y,casillas[x][y]->background_color);
+    for(std::size_t i=0;i<casillas[x][y]->fs.size();i++) {
+        assingColorBackground(casillas[x][y]->fs[i].int_x,casillas[x][y]->fs[i].int_y,casillas[casillas[x][y]->fs[i].int_x][casillas[x][y]->fs[i].int_y]->background_color);
+    }
+}
+
+void MainWindow::assingColorBackground(int x,int y,bool isBlack){
+    if(isBlack){
+        casillas[x][y]->setStyleSheet("background-color: #540C0B;" "width: 60px;" "height:60px");
+    }
+    else{
+        casillas[x][y]->setStyleSheet("background-color: #DFB082;" "width: 60px;" "height:60px");
     }
 }
 

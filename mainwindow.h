@@ -40,6 +40,9 @@ private:
     void assingPieces();
     QSignalMapper* signalMapper = new QSignalMapper (this);
     void createPiece(int,int,bool,QString,QString);
+    void changeBackground(int,int);
+    void restartBackground(int,int);
+    void assingColorBackground(int,int,bool);
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

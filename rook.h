@@ -12,7 +12,7 @@ class Rook : public Piece {
 
     public:
         Rook();
-        Rook(int, int);
+        Rook(int,int,QString,QString,QString,bool);
         void wherePiece();
 
 };

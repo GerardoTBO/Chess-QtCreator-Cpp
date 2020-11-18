@@ -5,7 +5,7 @@ King::King()
 
 }
 
-King::King(int x, int y) {
+King::King(int x, int y, QString dir_image, QString piece_color, QString class_name, bool background_color) : Piece(dir_image,piece_color,class_name,background_color){
     coor.int_x = x;
     coor.int_y = y;
 }

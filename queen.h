@@ -12,7 +12,7 @@ class Queen : public Piece{
 
     public:
         Queen();
-        Queen(int, int);
+        Queen(int,int,QString,QString,QString,bool);
         void wherePiece();
 };
 

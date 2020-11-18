@@ -13,7 +13,7 @@ class Horse : public Piece{
 
     public:
         Horse();
-        Horse(int, int);
+        Horse(int,int,QString,QString,QString,bool);
         void wherePiece();
 };
 

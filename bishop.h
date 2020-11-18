@@ -10,7 +10,7 @@ class Bishop : public Piece {
 
     public:
         Bishop();
-        Bishop(int, int);
+        Bishop(int,int,QString,QString,QString,bool);
         void wherePiece();
 };
 

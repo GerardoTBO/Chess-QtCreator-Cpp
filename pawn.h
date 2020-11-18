@@ -13,7 +13,7 @@ class Pawn : public Piece {
 
     public:
         Pawn();
-        Pawn(int, int);
+        Pawn(int,int,QString,QString,QString,bool);
         void wherePiece();
 };
 

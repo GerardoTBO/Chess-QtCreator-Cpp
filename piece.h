@@ -9,9 +9,11 @@ class Piece : public QPushButton
 {
 public:
     Piece();
+    Piece(QString,QString,QString,bool);
     QString dir_image = "";
     QString piece_color = "";
     QString class_name = "";
+    bool background_color;
     Coordinate coor;
     std::vector<Coordinate> fs;
     virtual void wherePiece();
