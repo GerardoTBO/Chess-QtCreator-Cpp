@@ -11,26 +11,26 @@ MainWindow::MainWindow(QWidget *parent)
     bool isBlack=true;
     for(int i=0;i<8;i++){
         for(int j=0;j<8;j++){
-//            std::string temp;
-//            switch(j)
-//            {
-//            case 0: temp=std::to_string(i+1)+"a";
-//                break;
-//            case 1: temp=std::to_string(i+1)+"b";
-//                break;
-//            case 2: temp=std::to_string(i+1)+"c";
-//                break;
-//            case 3: temp=std::to_string(i+1)+"d";
-//                break;
-//            case 4: temp=std::to_string(i+1)+"e";
-//                break;
-//            case 5: temp=std::to_string(i+1)+"f";
-//                break;
-//            case 6: temp=std::to_string(i+1)+"g";
-//                break;
-//            case 7: temp=std::to_string(i+1)+"h";
-//                break;
-//            }
+            //            std::string temp;
+            //            switch(j)
+            //            {
+            //            case 0: temp=std::to_string(i+1)+"a";
+            //                break;
+            //            case 1: temp=std::to_string(i+1)+"b";
+            //                break;
+            //            case 2: temp=std::to_string(i+1)+"c";
+            //                break;
+            //            case 3: temp=std::to_string(i+1)+"d";
+            //                break;
+            //            case 4: temp=std::to_string(i+1)+"e";
+            //                break;
+            //            case 5: temp=std::to_string(i+1)+"f";
+            //                break;
+            //            case 6: temp=std::to_string(i+1)+"g";
+            //                break;
+            //            case 7: temp=std::to_string(i+1)+"h";
+            //                break;
+            //            }
             createPiece(i,j,isBlack,"piece","");
 
             if(j!=7){
@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::createPiece(int x,int y,bool isBlack,QString tipo, QString color){
-//    ui->gridLayout->removeWidget(casillas[x][y]);
+    //    ui->gridLayout->removeWidget(casillas[x][y]);
 
     //Creacion de Ficha de algun tipo y asignacion de icono
     if(tipo.compare("piece")==0){
@@ -57,23 +57,23 @@ void MainWindow::createPiece(int x,int y,bool isBlack,QString tipo, QString colo
         casillas[x][y]->dir_image= "://pieces/"+color+"-pawn.png";
     }
     else if(tipo.compare("bishop")==0){
-        casillas[x][y] = new Pawn(x,y);
+        casillas[x][y] = new Bishop(x,y);
         casillas[x][y]->dir_image= "://pieces/"+color+"-bishop.png";
     }
     else if(tipo.compare("horse")==0){
-        casillas[x][y] = new Pawn(x,y);
+        casillas[x][y] = new Horse(x,y);
         casillas[x][y]->dir_image= "://pieces/"+color+"-horse.png";
     }
     else if(tipo.compare("tower")==0){
-        casillas[x][y] = new Pawn(x,y);
+        casillas[x][y] = new Rook(x,y);
         casillas[x][y]->dir_image= "://pieces/"+color+"-tower.png";
     }
     else if(tipo.compare("queen")==0){
-        casillas[x][y] = new Pawn(x,y);
+        casillas[x][y] = new Queen(x,y);
         casillas[x][y]->dir_image= "://pieces/"+color+"-queen.png";
     }
     else if(tipo.compare("king")==0){
-        casillas[x][y] = new Pawn(x,y);
+        casillas[x][y] = new King(x,y);
         casillas[x][y]->dir_image= "://pieces/"+color+"-king.png";
     }
     casillas[x][y]->piece_color = color;
@@ -81,8 +81,8 @@ void MainWindow::createPiece(int x,int y,bool isBlack,QString tipo, QString colo
     casillas[x][y]->setIcon(QIcon(casillas[x][y]->dir_image));
     casillas[x][y]->setIconSize(QSize(40,40));
 
-//    QString temp = QString::number(x) + " " + QString::number(y);
-//    casillas[x][y]->setText(temp);
+    //    QString temp = QString::number(x) + " " + QString::number(y);
+    //    casillas[x][y]->setText(temp);
 
     //Color del casillleros
     if(isBlack){

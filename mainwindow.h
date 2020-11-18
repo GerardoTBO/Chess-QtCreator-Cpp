@@ -10,6 +10,11 @@
 #include <iostream>
 #include "piece.h"
 #include "pawn.h"
+#include "bishop.h"
+#include "horse.h"
+#include "king.h"
+#include "queen.h"
+#include "rook.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

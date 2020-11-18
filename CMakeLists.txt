@@ -39,6 +39,16 @@ if(ANDROID)
     pawn.h
     Pieces.qrc
     coordinate.h
+    bishop.cpp
+    bishop.h
+    horse.cpp
+    horse.h
+    king.cpp
+    king.h
+    queen.cpp
+    queen.h
+    rook.cpp
+    rook.h
   )
 else()
   add_executable(Chess-QtCreator-Cpp
@@ -52,6 +62,16 @@ else()
     pawn.h
     Pieces.qrc
     coordinate.h
+    bishop.cpp
+    bishop.h
+    horse.cpp
+    horse.h
+    king.cpp
+    king.h
+    queen.cpp
+    queen.h
+    rook.cpp
+    rook.h
   )
 endif()
 
