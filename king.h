@@ -5,14 +5,10 @@
 #include <cmath>
 
 class King : public Piece {
-
-    private:
-        bool firstStep{true};
-
     public:
         King();
         King(int,int,QString,QString,QString,bool);
-        void wherePiece();
+        void wherePiece(Piece* casillas[8][8]);
 };
 
 #endif // KING_H

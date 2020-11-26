@@ -4,17 +4,10 @@
 #include "piece.h"
 
 class Pawn : public Piece {
-
-    private:
-        bool firstStep{true};
-        bool secondStep{false};
-        bool estaLleno{false};
-
-
     public:
         Pawn();
         Pawn(int,int,QString,QString,QString,bool);
-        void wherePiece();
+        void wherePiece(Piece* casillas[8][8]);
 };
 
 #endif // PAWN_H

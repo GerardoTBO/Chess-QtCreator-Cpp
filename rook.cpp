@@ -10,7 +10,7 @@ Rook::Rook(int x, int y, QString dir_image, QString piece_color, QString class_n
     coor.int_y = y;
 }
 
-void Rook::wherePiece() {
+void Rook::wherePiece(Piece* casillas[8][8]) {
     fs.clear();
     qDebug() << "Los elementos disponibles de la torre en la posicion ("<< coor.int_x << ", "<< coor.int_y << ") son\n";
     for (int x = 0; x < 8; x++) {

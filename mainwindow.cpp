@@ -41,14 +41,14 @@ MainWindow::MainWindow(QWidget *parent)
     //Coneccion Final de los Slots
     connect (signalMapper, SIGNAL(mapped(int)), this, SLOT(movePiece(int)));
 
-    //Crea todas las fichas en sus respectivas posiciones y colores
+    //Crea todas las piezas en sus respectivas posiciones y colores
     assingPieces();
 }
 
 void MainWindow::createPiece(int x,int y,bool isBlack,QString tipo, QString color){
     //    ui->gridLayout->removeWidget(casillas[x][y]);
 
-    //Creacion de Ficha de algun tipo y asignacion de icono
+    //Creacion de piezas de algun tipo y asignacion de icono
     if(tipo.compare("piece")==0){
         casillas[x][y] = new Piece("",color,tipo,isBlack);
     }
@@ -92,24 +92,32 @@ void MainWindow::movePiece(int c){
     int x = c/10;
     int y = c%10;
 
-    //Selecciona ficha a mover
+    //Selecciona pieza a mover
     if(casillas[x][y]->class_name.compare("")!=0 && ((casillas[x][y]->piece_color.compare("white")==0 && turn%2==1) || (casillas[x][y]->piece_color.compare("black")==0 && turn%2==0)) && posiciones[0]==-1 && posiciones[1]==-1){
         posiciones[0]=x;
         posiciones[1]=y;
         //Calcula las coordenadas donde se puede mover
-        casillas[x][y]->wherePiece();
+        casillas[x][y]->wherePiece(casillas);
         changeBackground(x,y);
     }
 
-    //Cambia de ficha a mover
+    //deseleccionar pieza
+    else if(posiciones[0]==x && posiciones[1]==y){
+        restartBackground(x,y);
+        posiciones[0]=-1;
+        posiciones[1]=-1;
+    }
+
+    //Cambia de pieza a mover
     else if(posiciones[0]!=-1 && posiciones[1]!=-1 && casillas[x][y]->piece_color.compare(casillas[posiciones[0]][posiciones[1]]->piece_color)==0){
         restartBackground(posiciones[0],posiciones[1]);
         posiciones[0]=x;
         posiciones[1]=y;
         //Calcula las coordenadas donde se puede mover
-        casillas[x][y]->wherePiece();
+        casillas[x][y]->wherePiece(casillas);
         changeBackground(x,y);
     }
+
     else if(posiciones[0]!=-1 && posiciones[1]!=-1){
         bool move_accept=false;
         //Itera en el vector de la piece casillas[posiciones[0]][posiciones[1] y verificar si se puede mover en esa nueva posicion
@@ -125,6 +133,8 @@ void MainWindow::movePiece(int c){
             restartBackground(posiciones[0],posiciones[1]);
             //Mueve la pieza a la nueva casilla
             createPiece(x,y,casillas[x][y]->background_color,casillas[posiciones[0]][posiciones[1]]->class_name,casillas[posiciones[0]][posiciones[1]]->piece_color);
+            //Marca la pieza como movida
+            casillas[x][y]->useFirsStep();
             //Limpia la anterior casillas
             createPiece(posiciones[0],posiciones[1],casillas[posiciones[0]][posiciones[1]]->background_color,"piece","");
             //Reinicio de posiciones guardadas y aumento de contador de turnos
@@ -133,6 +143,7 @@ void MainWindow::movePiece(int c){
             turn++;
         }
     }
+
 }
 
 void MainWindow::changeBackground(int x,int y){
@@ -159,7 +170,7 @@ void MainWindow::assingColorBackground(int x,int y,bool isBlack){
 }
 
 void MainWindow::assingPieces(){
-    //Fichas Blancas
+    //Piezas Blancas
     createPiece(0,0,true,"tower","white");
     createPiece(0,1,false,"horse","white");
     createPiece(0,2,true,"bishop","white");
@@ -178,7 +189,7 @@ void MainWindow::assingPieces(){
     createPiece(1,6,false,"pawn","white");
     createPiece(1,7,true,"pawn","white");
 
-    //Fichas Negras
+    //Piezas Negras
     createPiece(7,0,false,"tower","black");
     createPiece(7,1,true,"horse","black");
     createPiece(7,2,false,"bishop","black");

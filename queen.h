@@ -6,14 +6,10 @@
 #include <cmath>
 
 class Queen : public Piece{
-
-    private:
-        bool firstStep{true};
-
     public:
         Queen();
         Queen(int,int,QString,QString,QString,bool);
-        void wherePiece();
+        void wherePiece(Piece* casillas[8][8]);
 };
 
 #endif // QUEEN_H

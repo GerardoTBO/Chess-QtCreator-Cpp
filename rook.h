@@ -6,15 +6,10 @@
 #include <cmath>
 
 class Rook : public Piece {
-
-    private:
-        bool firstStep{true};
-
     public:
         Rook();
         Rook(int,int,QString,QString,QString,bool);
-        void wherePiece();
-
+        void wherePiece(Piece* casillas[8][8]);
 };
 
 #endif // ROOK_H

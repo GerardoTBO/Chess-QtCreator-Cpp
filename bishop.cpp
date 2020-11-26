@@ -10,7 +10,7 @@ Bishop::Bishop(int x, int y, QString dir_image, QString piece_color, QString cla
     coor.int_y = y;
 }
 
-void Bishop::wherePiece() {
+void Bishop::wherePiece(Piece* casillas[8][8]) {
     qDebug() << "Los elementos disponibles del alfil en la posicion ("<< coor.int_x << ", "<< coor.int_y << ") son\n";
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
@@ -29,3 +29,4 @@ void Bishop::wherePiece() {
         qDebug() << "x: " << i.int_x << ", y: " << i.int_y << "\n";
     });
 }
+

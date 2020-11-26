@@ -7,14 +7,10 @@
 #include <cmath>
 
 class Horse : public Piece{
-
-    private:
-        bool firstStep{true};
-
     public:
         Horse();
         Horse(int,int,QString,QString,QString,bool);
-        void wherePiece();
+        void wherePiece(Piece* casillas[8][8]);
 };
 
 #endif // HORSE_H

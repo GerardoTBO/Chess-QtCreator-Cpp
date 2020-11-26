@@ -13,7 +13,10 @@ Piece::Piece(QString dir_image,QString piece_color,QString class_name,bool backg
     this->background_color = background_color;
 }
 
-void Piece::wherePiece(){
+void Piece::wherePiece(Piece* casillas[8][8]){
 
 }
 
+void Piece::useFirsStep(){
+    firstStep = false;
+}
