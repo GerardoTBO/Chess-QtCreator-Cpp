@@ -14,6 +14,7 @@ public:
     Piece();
     Piece(QString,QString,QString,bool);
     Coordinate coor;
+    Coordinate pos;
     std::vector<Coordinate> fs;
     virtual void wherePiece(Piece* casillas[8][8]);
     void useFirsStep();

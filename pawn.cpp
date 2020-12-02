@@ -25,13 +25,11 @@ void Pawn::wherePiece(Piece* casillas[8][8]) {
         for (int y = 0; y < 8; y++) {
             if(firstStep) {
                 if(piece_color.compare("white")==0 && (coor.int_x + 2 >= x && x > coor.int_x) && y == coor.int_y) {
-                    Coordinate pos;
                     pos.int_x = x;
                     pos.int_y = y;
                     fs.push_back(pos);
                 }
                 else if(piece_color.compare("black")==0 && (coor.int_x - 2 <= x && x < coor.int_x) && y == coor.int_y) {
-                    Coordinate pos;
                     pos.int_x = x;
                     pos.int_y = y;
                     fs.push_back(pos);
@@ -39,13 +37,11 @@ void Pawn::wherePiece(Piece* casillas[8][8]) {
             }
             else{
                 if(piece_color.compare("white")==0 && (coor.int_x + 1 >= x && x > coor.int_x) && y == coor.int_y) {
-                    Coordinate pos;
                     pos.int_x = x;
                     pos.int_y = y;
                     fs.push_back(pos);
                 }
                 else if(piece_color.compare("black")==0 && (coor.int_x - 1 <= x && x < coor.int_x) && y == coor.int_y) {
-                    Coordinate pos;
                     pos.int_x = x;
                     pos.int_y = y;
                     fs.push_back(pos);

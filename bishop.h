@@ -8,6 +8,7 @@ class Bishop : public Piece {
         Bishop();
         Bishop(int,int,QString,QString,QString,bool);
         void wherePiece(Piece* casillas[8][8]);
+        void addMovement(bool&,Piece*,int,int);
 };
 
 #endif // BISHOP_H
