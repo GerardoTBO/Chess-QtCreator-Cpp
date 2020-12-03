@@ -8,6 +8,7 @@ class Pawn : public Piece {
         Pawn();
         Pawn(int,int,QString,QString,QString,bool);
         void wherePiece(Piece* casillas[8][8]);
+        void addMovement(int,int);
 };
 
 #endif // PAWN_H
