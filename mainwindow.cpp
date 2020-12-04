@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //Disable resize window
+    this->setFixedSize(this->width(), this->height());
 
     bool isBlack=true;
     for(int i=0;i<8;i++){
@@ -73,14 +75,11 @@ void MainWindow::createPiece(int x,int y,bool isBlack,QString tipo, QString colo
     casillas[x][y]->setIcon(QIcon(casillas[x][y]->dir_image));
     casillas[x][y]->setIconSize(QSize(40,40));
 
-    //    QString temp = QString::number(x) + " " + QString::number(y);
-    //    casillas[x][y]->setText(temp);
-
     //Color del casilllero
     assingColorBackground(x,y,isBlack);
 
     //Agregar elementos a gridlayout
-    ui->gridLayout->addWidget(casillas[x][y],7-x,y);
+    ui->board->addWidget(casillas[x][y],7-x,y);
 
     //Coneccion de eventos a Piece's
     connect (casillas[x][y], SIGNAL(clicked()), signalMapper, SLOT(map()));
@@ -131,6 +130,10 @@ void MainWindow::movePiece(int c){
         if(move_accept){
             //Limpia los background
             restartBackground(posiciones[0],posiciones[1]);
+            //Agrega la pieza capturada
+            if(casillas[x][y]->class_name.compare("piece")!=0 && casillas[x][y]->piece_color.compare(casillas[posiciones[0]][posiciones[1]]->piece_color)!=0){
+                addPieceCapture(casillas[x][y]->piece_color,casillas[x][y]->dir_image);
+            }
             //Mueve la pieza a la nueva casilla
             createPiece(x,y,casillas[x][y]->background_color,casillas[posiciones[0]][posiciones[1]]->class_name,casillas[posiciones[0]][posiciones[1]]->piece_color);
             //Marca la pieza como movida
@@ -144,6 +147,39 @@ void MainWindow::movePiece(int c){
         }
     }
 
+}
+
+void MainWindow::addPieceCapture(QString color, QString image){
+    if(color.compare("white")==0){
+        int posicionTemporal=posicionesBlackCapture[0]*10+posicionesBlackCapture[1];
+        blackPiecesEat[posicionTemporal]=new QLabel();
+        blackPiecesEat[posicionTemporal]->setStyleSheet("width: 30px;" "height:30px");
+        blackPiecesEat[posicionTemporal]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,30)));
+        ui->capture_black_pieces->addWidget(blackPiecesEat[posicionTemporal],posicionesBlackCapture[0],posicionesBlackCapture[1],Qt::AlignTop);
+//        ui->capture_black_pieces->addWidget(blackPiecesEat[posicionTemporal],posicionesBlackCapture[0],posicionesBlackCapture[1]);
+        if(posicionesBlackCapture[1]<4){
+            posicionesBlackCapture[1]++;
+        }
+        else{
+            posicionesBlackCapture[1]=0;
+            posicionesBlackCapture[0]++;
+        }
+    }
+    else if(color.compare("black")==0){
+        int posicionTemporal=posicionesWhiteCapture[0]*10+posicionesWhiteCapture[1];
+        whitePiecesEat[posicionTemporal]=new QLabel();
+        whitePiecesEat[posicionTemporal]->setStyleSheet("width: 30px;" "height:30px");
+        whitePiecesEat[posicionTemporal]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,30)));
+        ui->capture_white_pieces->addWidget(whitePiecesEat[posicionTemporal],0,0);
+        ui->capture_white_pieces->addWidget(whitePiecesEat[posicionTemporal],posicionesWhiteCapture[0],posicionesWhiteCapture[1],Qt::AlignTop);
+        if(posicionesWhiteCapture[1]<4){
+            posicionesWhiteCapture[1]++;
+        }
+        else{
+            posicionesWhiteCapture[1]=0;
+            posicionesWhiteCapture[0]++;
+        }
+    }
 }
 
 void MainWindow::changeBackground(int x,int y){

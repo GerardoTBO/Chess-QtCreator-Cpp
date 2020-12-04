@@ -34,15 +34,20 @@ public slots:
 private:
     //Posiciones Guardadas
     int posiciones[2]={-1,-1};
+    int posicionesWhiteCapture[2]={0,0};
+    int posicionesBlackCapture[2]={0,0};
     int turn = 1;
     //QPushButtons
     Piece* casillas[8][8];
+    QLabel* whitePiecesEat[16];
+    QLabel* blackPiecesEat[16];
     void assingPieces();
     QSignalMapper* signalMapper = new QSignalMapper (this);
     void createPiece(int,int,bool,QString,QString);
     void changeBackground(int,int);
     void restartBackground(int,int);
     void assingColorBackground(int,int,bool);
+    void addPieceCapture(QString,QString);
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H
