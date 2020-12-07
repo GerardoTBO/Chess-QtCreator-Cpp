@@ -13,10 +13,14 @@ Piece::Piece(QString dir_image,QString piece_color,QString class_name,bool backg
     this->background_color = background_color;
 }
 
-void Piece::wherePiece(Piece* casillas[8][8]){
+void Piece::wherePiece(Piece* casillas[8][8],bool firstIteracion,bool quede){
 
 }
 
 void Piece::useFirsStep(){
     firstStep = false;
+}
+
+void Piece::deleteElementFs(Coordinate){
+
 }

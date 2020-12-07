@@ -96,7 +96,7 @@ void MainWindow::movePiece(int c){
         posiciones[0]=x;
         posiciones[1]=y;
         //Calcula las coordenadas donde se puede mover
-        casillas[x][y]->wherePiece(casillas);
+        casillas[x][y]->wherePiece(casillas,true,false);
         changeBackground(x,y);
     }
 
@@ -113,7 +113,7 @@ void MainWindow::movePiece(int c){
         posiciones[0]=x;
         posiciones[1]=y;
         //Calcula las coordenadas donde se puede mover
-        casillas[x][y]->wherePiece(casillas);
+        casillas[x][y]->wherePiece(casillas,true,false);
         changeBackground(x,y);
     }
 
@@ -138,6 +138,8 @@ void MainWindow::movePiece(int c){
             createPiece(x,y,casillas[x][y]->background_color,casillas[posiciones[0]][posiciones[1]]->class_name,casillas[posiciones[0]][posiciones[1]]->piece_color);
             //Marca la pieza como movida
             casillas[x][y]->useFirsStep();
+            //Calcula si algun rey esta en jake
+            casillas[x][y]->wherePiece(casillas,true,true);
             //Limpia la anterior casillas
             createPiece(posiciones[0],posiciones[1],casillas[posiciones[0]][posiciones[1]]->background_color,"piece","");
             //Reinicio de posiciones guardadas y aumento de contador de turnos

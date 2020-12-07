@@ -10,7 +10,7 @@ class Horse : public Piece{
     public:
         Horse();
         Horse(int,int,QString,QString,QString,bool);
-        void wherePiece(Piece* casillas[8][8]);
+        void wherePiece(Piece* casillas[8][8],bool,bool);
 };
 
 #endif // HORSE_H

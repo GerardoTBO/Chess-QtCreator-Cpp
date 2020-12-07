@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>878</width>
-    <height>474</height>
+    <width>1032</width>
+    <height>584</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,8 +20,8 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>20</y>
+      <x>260</x>
+      <y>80</y>
       <width>521</width>
       <height>411</height>
      </rect>
@@ -38,7 +38,7 @@
    <widget class="QLabel" name="white_label">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>40</x>
       <y>20</y>
       <width>131</width>
       <height>61</height>
@@ -74,7 +74,7 @@ background-color: rgb(223,176,130,0.5);</string>
    <widget class="QLabel" name="black_label">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>870</x>
       <y>20</y>
       <width>131</width>
       <height>61</height>
@@ -104,10 +104,10 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
    <widget class="QWidget" name="gridLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>90</y>
-      <width>160</width>
-      <height>111</height>
+      <width>181</width>
+      <height>241</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="capture_black_pieces">
@@ -122,10 +122,10 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
    <widget class="QWidget" name="gridLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>710</x>
-      <y>100</y>
+      <x>850</x>
+      <y>90</y>
       <width>160</width>
-      <height>111</height>
+      <height>231</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="capture_white_pieces">
@@ -137,13 +137,70 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
      </property>
     </layout>
    </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>80</y>
+      <width>41</width>
+      <height>411</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="numbers_right_layout"/>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>80</y>
+      <width>41</width>
+      <height>411</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="numbers_left_layout"/>
+   </widget>
+   <widget class="QLabel" name="time_label">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>10</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>00:00</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>40</y>
+      <width>521</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="letters_superior_layout"/>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>490</y>
+      <width>521</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="letters_inferior_layout"/>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>878</width>
+     <width>1032</width>
      <height>20</height>
     </rect>
    </property>

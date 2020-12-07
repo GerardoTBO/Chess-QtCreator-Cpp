@@ -10,7 +10,7 @@ Horse::Horse(int x, int y, QString dir_image, QString piece_color, QString class
     coor.int_y = y;
 }
 
-void Horse::wherePiece(Piece* casillas[8][8]) {
+void Horse::wherePiece(Piece* casillas[8][8],bool firstIteracion,bool quede) {
     fs.clear();
     qDebug() << "Los elementos disponibles del caballo en la posicion ("<< coor.int_x << ", "<< coor.int_y << ") son\n";
     for (int x = 0; x < 8; x++) {
