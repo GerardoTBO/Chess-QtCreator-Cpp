@@ -26,7 +26,7 @@
       <height>411</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="board">
+    <layout class="QGridLayout" name="boardGrid">
      <property name="sizeConstraint">
       <enum>QLayout::SetNoConstraint</enum>
      </property>
@@ -35,7 +35,7 @@
      </property>
     </layout>
    </widget>
-   <widget class="QLabel" name="white_label">
+   <widget class="QLabel" name="whiteLabel">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -71,7 +71,7 @@ background-color: rgb(223,176,130,0.5);</string>
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="black_label">
+   <widget class="QLabel" name="blackLabel">
     <property name="geometry">
      <rect>
       <x>870</x>
@@ -110,9 +110,21 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
       <height>241</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="capture_black_pieces">
+    <layout class="QGridLayout" name="captureBlackPiecesGrid">
      <property name="sizeConstraint">
-      <enum>QLayout::SetNoConstraint</enum>
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
      </property>
      <property name="spacing">
       <number>0</number>
@@ -128,9 +140,21 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
       <height>231</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="capture_white_pieces">
+    <layout class="QGridLayout" name="captureWhitePiecesGrid">
      <property name="sizeConstraint">
-      <enum>QLayout::SetNoConstraint</enum>
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
      </property>
      <property name="spacing">
       <number>0</number>
@@ -146,7 +170,7 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
       <height>411</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="numbers_right_layout"/>
+    <layout class="QVBoxLayout" name="numbersRightLayout"/>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
@@ -157,9 +181,9 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
       <height>411</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="numbers_left_layout"/>
+    <layout class="QVBoxLayout" name="numbersLeftLayout"/>
    </widget>
-   <widget class="QLabel" name="time_label">
+   <widget class="QLabel" name="timeLabel">
     <property name="geometry">
      <rect>
       <x>470</x>
@@ -181,7 +205,7 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
       <height>41</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="letters_superior_layout"/>
+    <layout class="QHBoxLayout" name="lettersSuperiorLayout"/>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
@@ -192,7 +216,7 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
       <height>41</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="letters_inferior_layout"/>
+    <layout class="QHBoxLayout" name="lettersInferiorLayout"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -204,12 +228,12 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuChess_Game">
+   <widget class="QMenu" name="menuChessGame">
     <property name="title">
      <string>Chess Game</string>
     </property>
    </widget>
-   <addaction name="menuChess_Game"/>
+   <addaction name="menuChessGame"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="mouseTracking">

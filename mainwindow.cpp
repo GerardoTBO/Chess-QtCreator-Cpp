@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QtDebug>
+#include "threadtimer.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -10,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     //Disable resize window
     this->setFixedSize(this->width(), this->height());
 
-    bool isBlack=true;
+    bool boxIsBlack=true;
     for(int i=0;i<8;i++){
         for(int j=0;j<8;j++){
             //            std::string temp;
@@ -33,10 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
             //            case 7: temp=std::to_string(i+1)+"h";
             //                break;
             //            }
-            createPiece(i,j,isBlack,"piece","");
+            createPiece(i,j,boxIsBlack,"","");
 
             if(j!=7){
-                isBlack=!isBlack;
+                boxIsBlack=!boxIsBlack;
             }
         }
     }
@@ -45,45 +46,74 @@ MainWindow::MainWindow(QWidget *parent)
 
     //Crea todas las piezas en sus respectivas posiciones y colores
     assingPieces();
+
+    //Inicializar tiempo de turnos
+    timer = new ThreadTimer(this);
+    timer->start();
+    connect(timer, &ThreadTimer::seconds, [&](int s){
+        if(s==0){
+            timer->reset();
+            turn++;
+            if(savedPosition[0]!=-1 && savedPosition[1]!=-1){
+                restartBackground(savedPosition[0],savedPosition[1]);
+                savedPosition[0]=-1;
+                savedPosition[1]=-1;
+            }
+            textLog += "skipTurn ";
+        }
+        ui->timeLabel->setText(QString::number(s/60)+":"+QString::number(s%60));
+    });
 }
 
-void MainWindow::createPiece(int x,int y,bool isBlack,QString tipo, QString color){
+void MainWindow::createPiece(int x,int y,bool boxIsBlack,QString type, QString color){
     //    ui->gridLayout->removeWidget(casillas[x][y]);
 
     //Creacion de piezas de algun tipo y asignacion de icono
-    if(tipo.compare("piece")==0){
-        casillas[x][y] = new Piece("",color,tipo,isBlack);
+    if(type.compare("")==0){
+        boxes[x][y] = new Piece(color,"",boxIsBlack);
     }
-    else if(tipo.compare("pawn")==0){
-        casillas[x][y] = new Pawn(x,y,"://pieces/"+color+"-pawn.png",color,tipo,isBlack);
+    else if(type.compare("P")==0){
+        boxes[x][y] = new Pawn(x,y,color,boxIsBlack);
     }
-    else if(tipo.compare("bishop")==0){
-        casillas[x][y] = new Bishop(x,y,"://pieces/"+color+"-bishop.png",color,tipo,isBlack);
+    else if(type.compare("B")==0){
+        boxes[x][y] = new Bishop(x,y,color,boxIsBlack);
     }
-    else if(tipo.compare("horse")==0){
-        casillas[x][y] = new Horse(x,y,"://pieces/"+color+"-horse.png",color,tipo,isBlack);
+    else if(type.compare("N")==0){
+        boxes[x][y] = new Knight(x,y,color,boxIsBlack);
     }
-    else if(tipo.compare("tower")==0){
-        casillas[x][y] = new Rook(x,y,"://pieces/"+color+"-tower.png",color,tipo,isBlack);
+    else if(type.compare("R")==0){
+        boxes[x][y] = new Rook(x,y,color,boxIsBlack);
     }
-    else if(tipo.compare("queen")==0){
-        casillas[x][y] = new Queen(x,y,"://pieces/"+color+"-queen.png",color,tipo,isBlack);
+    else if(type.compare("Q")==0){
+        boxes[x][y] = new Queen(x,y,color,boxIsBlack);
     }
-    else if(tipo.compare("king")==0){
-        casillas[x][y] = new King(x,y,"://pieces/"+color+"-king.png",color,tipo,isBlack);
+    else if(type.compare("K")==0){
+        boxes[x][y] = new King(x,y,color,boxIsBlack);
     }
-    casillas[x][y]->setIcon(QIcon(casillas[x][y]->dir_image));
-    casillas[x][y]->setIconSize(QSize(40,40));
+    boxes[x][y]->setIcon(QIcon(boxes[x][y]->imageDirection));
+    boxes[x][y]->setIconSize(QSize(40,40));
 
     //Color del casilllero
-    assingColorBackground(x,y,isBlack);
+    assingColorBackground(x,y,boxIsBlack);
 
     //Agregar elementos a gridlayout
-    ui->board->addWidget(casillas[x][y],7-x,y);
+    ui->boardGrid->addWidget(boxes[x][y],7-x,y);
 
     //Coneccion de eventos a Piece's
-    connect (casillas[x][y], SIGNAL(clicked()), signalMapper, SLOT(map()));
-    signalMapper -> setMapping (casillas[x][y], x*10+y);
+    connect (boxes[x][y], SIGNAL(clicked()), signalMapper, SLOT(map()));
+    signalMapper -> setMapping (boxes[x][y], x*10+y);
+}
+
+void MainWindow::saveMove(int xO, int yO, int xF, int yF){
+    //Agrega la posiciones inicial de la pieza movida
+    textLog += boxes[xO][yO]->initialLetter + QString::number(xO) + QString::number(yO);
+    //Agrega x si se capturo una pieza enemiga
+    if(boxes[xF][yF]->initialLetter.compare("")!=0){
+        textLog += "x";
+    }
+    //Agrega la posicion final de la pieza movida y un salto de linea
+    textLog += QString::number(xF) + QString::number(yO) + " ";
+    qDebug() << textLog;
 }
 
 void MainWindow::movePiece(int c){
@@ -92,60 +122,65 @@ void MainWindow::movePiece(int c){
     int y = c%10;
 
     //Selecciona pieza a mover
-    if(casillas[x][y]->class_name.compare("")!=0 && ((casillas[x][y]->piece_color.compare("white")==0 && turn%2==1) || (casillas[x][y]->piece_color.compare("black")==0 && turn%2==0)) && posiciones[0]==-1 && posiciones[1]==-1){
-        posiciones[0]=x;
-        posiciones[1]=y;
+    if(boxes[x][y]->initialLetter.compare("")!=0 && ((boxes[x][y]->pieceColor.compare("white")==0 && turn%2==1) || (boxes[x][y]->pieceColor.compare("black")==0 && turn%2==0)) && savedPosition[0]==-1 && savedPosition[1]==-1){
+        savedPosition[0]=x;
+        savedPosition[1]=y;
         //Calcula las coordenadas donde se puede mover
-        casillas[x][y]->wherePiece(casillas,true,false);
+        boxes[x][y]->wherePiece(boxes,true,false);
         changeBackground(x,y);
     }
 
     //deseleccionar pieza
-    else if(posiciones[0]==x && posiciones[1]==y){
+    else if(savedPosition[0]==x && savedPosition[1]==y){
         restartBackground(x,y);
-        posiciones[0]=-1;
-        posiciones[1]=-1;
+        savedPosition[0]=-1;
+        savedPosition[1]=-1;
     }
 
     //Cambia de pieza a mover
-    else if(posiciones[0]!=-1 && posiciones[1]!=-1 && casillas[x][y]->piece_color.compare(casillas[posiciones[0]][posiciones[1]]->piece_color)==0){
-        restartBackground(posiciones[0],posiciones[1]);
-        posiciones[0]=x;
-        posiciones[1]=y;
+    else if(savedPosition[0]!=-1 && savedPosition[1]!=-1 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)==0){
+        restartBackground(savedPosition[0],savedPosition[1]);
+        savedPosition[0]=x;
+        savedPosition[1]=y;
         //Calcula las coordenadas donde se puede mover
-        casillas[x][y]->wherePiece(casillas,true,false);
+        boxes[x][y]->wherePiece(boxes,true,false);
         changeBackground(x,y);
     }
 
-    else if(posiciones[0]!=-1 && posiciones[1]!=-1){
-        bool move_accept=false;
+    else if(savedPosition[0]!=-1 && savedPosition[1]!=-1){
+        bool moveAccepted=false;
         //Itera en el vector de la piece casillas[posiciones[0]][posiciones[1] y verificar si se puede mover en esa nueva posicion
-        for(std::size_t i=0;i<casillas[posiciones[0]][posiciones[1]]->fs.size();i++) {
-            if(x==casillas[posiciones[0]][posiciones[1]]->fs[i].int_x && y==casillas[posiciones[0]][posiciones[1]]->fs[i].int_y){
-                move_accept=true;
+        for(std::size_t i=0;i<boxes[savedPosition[0]][savedPosition[1]]->possibleMovements.size();i++) {
+            if(x==boxes[savedPosition[0]][savedPosition[1]]->possibleMovements[i].intX && y==boxes[savedPosition[0]][savedPosition[1]]->possibleMovements[i].intY){
+                moveAccepted=true;
             }
         }
 
         //Realiza el movimiento
-        if(move_accept){
+        if(moveAccepted){
+            //Guarda en el log
+            saveMove(savedPosition[0],savedPosition[1],x,y);
+
             //Limpia los background
-            restartBackground(posiciones[0],posiciones[1]);
+            restartBackground(savedPosition[0],savedPosition[1]);
+
             //Agrega la pieza capturada
-            if(casillas[x][y]->class_name.compare("piece")!=0 && casillas[x][y]->piece_color.compare(casillas[posiciones[0]][posiciones[1]]->piece_color)!=0){
-                addPieceCapture(casillas[x][y]->piece_color,casillas[x][y]->dir_image);
+            if(boxes[x][y]->initialLetter.compare("")!=0 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)!=0){
+                addPieceCapture(boxes[x][y]->pieceColor,boxes[x][y]->imageDirection);
             }
             //Mueve la pieza a la nueva casilla
-            createPiece(x,y,casillas[x][y]->background_color,casillas[posiciones[0]][posiciones[1]]->class_name,casillas[posiciones[0]][posiciones[1]]->piece_color);
+            createPiece(x,y,boxes[x][y]->backgroundColor,boxes[savedPosition[0]][savedPosition[1]]->initialLetter,boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
             //Marca la pieza como movida
-            casillas[x][y]->useFirsStep();
+            boxes[x][y]->useFirsStep();
             //Calcula si algun rey esta en jake
-            casillas[x][y]->wherePiece(casillas,true,true);
+            boxes[x][y]->wherePiece(boxes,true,true);
             //Limpia la anterior casillas
-            createPiece(posiciones[0],posiciones[1],casillas[posiciones[0]][posiciones[1]]->background_color,"piece","");
+            createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
             //Reinicio de posiciones guardadas y aumento de contador de turnos
-            posiciones[0] = -1;
-            posiciones[1] = -1;
+            savedPosition[0] = -1;
+            savedPosition[1] = -1;
             turn++;
+            timer->reset();
         }
     }
 
@@ -153,98 +188,97 @@ void MainWindow::movePiece(int c){
 
 void MainWindow::addPieceCapture(QString color, QString image){
     if(color.compare("white")==0){
-        int posicionTemporal=posicionesBlackCapture[0]*10+posicionesBlackCapture[1];
-        blackPiecesEat[posicionTemporal]=new QLabel();
-        blackPiecesEat[posicionTemporal]->setStyleSheet("width: 30px;" "height:30px");
-        blackPiecesEat[posicionTemporal]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,30)));
-        ui->capture_black_pieces->addWidget(blackPiecesEat[posicionTemporal],posicionesBlackCapture[0],posicionesBlackCapture[1],Qt::AlignTop);
+        int posicionTemporal=positionsBlackCapture[0]*10+positionsBlackCapture[1];
+        blackPiecesCapture[posicionTemporal]=new QLabel();
+        blackPiecesCapture[posicionTemporal]->setStyleSheet("width: 30px;" "height:50px");
+        blackPiecesCapture[posicionTemporal]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,50)));
+        ui->captureBlackPiecesGrid->addWidget(blackPiecesCapture[posicionTemporal],positionsBlackCapture[0],positionsBlackCapture[1],Qt::AlignTop);
 //        ui->capture_black_pieces->addWidget(blackPiecesEat[posicionTemporal],posicionesBlackCapture[0],posicionesBlackCapture[1]);
-        if(posicionesBlackCapture[1]<4){
-            posicionesBlackCapture[1]++;
+        if(positionsBlackCapture[1]<4){
+            positionsBlackCapture[1]++;
         }
         else{
-            posicionesBlackCapture[1]=0;
-            posicionesBlackCapture[0]++;
+            positionsBlackCapture[1]=0;
+            positionsBlackCapture[0]++;
         }
     }
     else if(color.compare("black")==0){
-        int posicionTemporal=posicionesWhiteCapture[0]*10+posicionesWhiteCapture[1];
-        whitePiecesEat[posicionTemporal]=new QLabel();
-        whitePiecesEat[posicionTemporal]->setStyleSheet("width: 30px;" "height:30px");
-        whitePiecesEat[posicionTemporal]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,30)));
-        ui->capture_white_pieces->addWidget(whitePiecesEat[posicionTemporal],0,0);
-        ui->capture_white_pieces->addWidget(whitePiecesEat[posicionTemporal],posicionesWhiteCapture[0],posicionesWhiteCapture[1],Qt::AlignTop);
-        if(posicionesWhiteCapture[1]<4){
-            posicionesWhiteCapture[1]++;
+        int posicionTemporal=positionsWhiteCapture[0]*10+positionsWhiteCapture[1];
+        whitePiecesCapture[posicionTemporal]=new QLabel();
+        whitePiecesCapture[posicionTemporal]->setStyleSheet("width: 30px;" "height:50px");
+        whitePiecesCapture[posicionTemporal]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,50)));
+        ui->captureWhitePiecesGrid->addWidget(whitePiecesCapture[posicionTemporal],positionsWhiteCapture[0],positionsWhiteCapture[1],Qt::AlignTop);
+        if(positionsWhiteCapture[1]<4){
+            positionsWhiteCapture[1]++;
         }
         else{
-            posicionesWhiteCapture[1]=0;
-            posicionesWhiteCapture[0]++;
+            positionsWhiteCapture[1]=0;
+            positionsWhiteCapture[0]++;
         }
     }
 }
 
 void MainWindow::changeBackground(int x,int y){
-    casillas[x][y]->setStyleSheet("background-color: #7E3B3A;" "width: 60px;" "height:60px");
-    for(std::size_t i=0;i<casillas[x][y]->fs.size();i++) {
-        casillas[casillas[x][y]->fs[i].int_x][casillas[x][y]->fs[i].int_y]->setStyleSheet("background-color: #C48E8D;" "width: 60px;" "height:60px");
+    boxes[x][y]->setStyleSheet("background-color: #7E3B3A;" "width: 60px;" "height:60px");
+    for(std::size_t i=0;i<boxes[x][y]->possibleMovements.size();i++) {
+        boxes[boxes[x][y]->possibleMovements[i].intX][boxes[x][y]->possibleMovements[i].intY]->setStyleSheet("background-color: #C48E8D;" "width: 60px;" "height:60px");
     }
 }
 
 void MainWindow::restartBackground(int x,int y){
-    assingColorBackground(x,y,casillas[x][y]->background_color);
-    for(std::size_t i=0;i<casillas[x][y]->fs.size();i++) {
-        assingColorBackground(casillas[x][y]->fs[i].int_x,casillas[x][y]->fs[i].int_y,casillas[casillas[x][y]->fs[i].int_x][casillas[x][y]->fs[i].int_y]->background_color);
+    assingColorBackground(x,y,boxes[x][y]->backgroundColor);
+    for(std::size_t i=0;i<boxes[x][y]->possibleMovements.size();i++) {
+        assingColorBackground(boxes[x][y]->possibleMovements[i].intX,boxes[x][y]->possibleMovements[i].intY,boxes[boxes[x][y]->possibleMovements[i].intX][boxes[x][y]->possibleMovements[i].intY]->backgroundColor);
     }
 }
 
-void MainWindow::assingColorBackground(int x,int y,bool isBlack){
-    if(isBlack){
-        casillas[x][y]->setStyleSheet("background-color: #540C0B;" "width: 60px;" "height:60px");
+void MainWindow::assingColorBackground(int x,int y,bool boxIsBlack){
+    if(boxIsBlack){
+        boxes[x][y]->setStyleSheet("background-color: #540C0B;" "width: 60px;" "height:60px");
     }
     else{
-        casillas[x][y]->setStyleSheet("background-color: #DFB082;" "width: 60px;" "height:60px");
+        boxes[x][y]->setStyleSheet("background-color: #DFB082;" "width: 60px;" "height:60px");
     }
 }
 
 void MainWindow::assingPieces(){
     //Piezas Blancas
-    createPiece(0,0,true,"tower","white");
-    createPiece(0,1,false,"horse","white");
-    createPiece(0,2,true,"bishop","white");
-    createPiece(0,3,false,"queen","white");
-    createPiece(0,4,true,"king","white");
-    createPiece(0,5,false,"bishop","white");
-    createPiece(0,6,true,"horse","white");
-    createPiece(0,7,false,"tower","white");
+    createPiece(0,0,true,"R","white");
+    createPiece(0,1,false,"N","white");
+    createPiece(0,2,true,"B","white");
+    createPiece(0,3,false,"Q","white");
+    createPiece(0,4,true,"K","white");
+    createPiece(0,5,false,"B","white");
+    createPiece(0,6,true,"N","white");
+    createPiece(0,7,false,"R","white");
 
-    createPiece(1,0,false,"pawn","white");
-    createPiece(1,1,true,"pawn","white");
-    createPiece(1,2,false,"pawn","white");
-    createPiece(1,3,true,"pawn","white");
-    createPiece(1,4,false,"pawn","white");
-    createPiece(1,5,true,"pawn","white");
-    createPiece(1,6,false,"pawn","white");
-    createPiece(1,7,true,"pawn","white");
+    createPiece(1,0,false,"P","white");
+    createPiece(1,1,true,"P","white");
+    createPiece(1,2,false,"P","white");
+    createPiece(1,3,true,"P","white");
+    createPiece(1,4,false,"P","white");
+    createPiece(1,5,true,"P","white");
+    createPiece(1,6,false,"P","white");
+    createPiece(1,7,true,"P","white");
 
     //Piezas Negras
-    createPiece(7,0,false,"tower","black");
-    createPiece(7,1,true,"horse","black");
-    createPiece(7,2,false,"bishop","black");
-    createPiece(7,3,true,"queen","black");
-    createPiece(7,4,false,"king","black");
-    createPiece(7,5,true,"bishop","black");
-    createPiece(7,6,false,"horse","black");
-    createPiece(7,7,true,"tower","black");
+    createPiece(7,0,false,"R","black");
+    createPiece(7,1,true,"N","black");
+    createPiece(7,2,false,"B","black");
+    createPiece(7,3,true,"Q","black");
+    createPiece(7,4,false,"K","black");
+    createPiece(7,5,true,"B","black");
+    createPiece(7,6,false,"N","black");
+    createPiece(7,7,true,"R","black");
 
-    createPiece(6,0,true,"pawn","black");
-    createPiece(6,1,false,"pawn","black");
-    createPiece(6,2,true,"pawn","black");
-    createPiece(6,3,false,"pawn","black");
-    createPiece(6,4,true,"pawn","black");
-    createPiece(6,5,false,"pawn","black");
-    createPiece(6,6,true,"pawn","black");
-    createPiece(6,7,false,"pawn","black");
+    createPiece(6,0,true,"P","black");
+    createPiece(6,1,false,"P","black");
+    createPiece(6,2,true,"P","black");
+    createPiece(6,3,false,"P","black");
+    createPiece(6,4,true,"P","black");
+    createPiece(6,5,false,"P","black");
+    createPiece(6,6,true,"P","black");
+    createPiece(6,7,false,"P","black");
 }
 
 MainWindow::~MainWindow()

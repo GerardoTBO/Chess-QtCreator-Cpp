@@ -8,8 +8,8 @@
 class Rook : public Piece {
     public:
         Rook();
-        Rook(int,int,QString,QString,QString,bool);
-        void wherePiece(Piece* casillas[8][8],bool,bool);
+        Rook(int,int,QString,bool);
+        void wherePiece(Piece* boxes[8][8],bool,bool);
         void addMovement(bool&,Piece*,int,int,bool);
 };
 

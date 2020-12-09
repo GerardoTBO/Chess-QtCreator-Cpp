@@ -5,15 +5,14 @@ Piece::Piece()
 
 }
 
-Piece::Piece(QString dir_image,QString piece_color,QString class_name,bool background_color)
+Piece::Piece(QString pieceColor,QString initialLetter,bool backgroundColor)
 {
-    this->dir_image = dir_image;
-    this->piece_color = piece_color;
-    this->class_name = class_name;
-    this->background_color = background_color;
+    this->pieceColor = pieceColor;
+    this->initialLetter = initialLetter;
+    this->backgroundColor = backgroundColor;
 }
 
-void Piece::wherePiece(Piece* casillas[8][8],bool firstIteracion,bool quede){
+void Piece::wherePiece(Piece* boxes[8][8],bool firstIteracion,bool jakeCheck){
 
 }
 

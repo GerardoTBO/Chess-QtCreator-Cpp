@@ -6,8 +6,8 @@
 class Pawn : public Piece {
     public:
         Pawn();
-        Pawn(int,int,QString,QString,QString,bool);
-        void wherePiece(Piece* casillas[8][8],bool,bool);
+        Pawn(int,int,QString,bool);
+        void wherePiece(Piece* boxes[8][8],bool,bool);
         void addMovement(int,int,bool);
 };
 

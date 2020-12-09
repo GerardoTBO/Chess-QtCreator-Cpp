@@ -41,14 +41,16 @@ if(ANDROID)
     coordinate.h
     bishop.cpp
     bishop.h
-    horse.cpp
-    horse.h
+    knight.cpp
+    knight.h
     king.cpp
     king.h
     queen.cpp
     queen.h
     rook.cpp
     rook.h
+    threadtimer.cpp
+    threadtimer.h
   )
 else()
   add_executable(Chess-QtCreator-Cpp
@@ -64,14 +66,16 @@ else()
     coordinate.h
     bishop.cpp
     bishop.h
-    horse.cpp
-    horse.h
+    knight.cpp
+    knight.h
     king.cpp
     king.h
     queen.cpp
     queen.h
     rook.cpp
     rook.h
+    threadtimer.cpp
+    threadtimer.h
   )
 endif()
 

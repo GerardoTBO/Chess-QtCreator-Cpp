@@ -12,18 +12,18 @@ protected:
 
 public:
     Piece();
-    Piece(QString,QString,QString,bool);
-    Coordinate coor;
-    Coordinate pos;
-    std::vector<Coordinate> fs;
-    virtual void wherePiece(Piece* casillas[8][8],bool,bool);
+    Piece(QString,QString,bool);
+    Coordinate actualPosition;
+    Coordinate temporalPosition;
+    std::vector<Coordinate> possibleMovements;
+    virtual void wherePiece(Piece* boxes[8][8],bool,bool);
     void useFirsStep();
     void deleteElementFs(Coordinate);
 
-    QString dir_image = "";
-    QString piece_color = "";
-    QString class_name = "";
-    bool background_color;
+    QString imageDirection = "";
+    QString pieceColor = "";
+    QString initialLetter = "";
+    bool backgroundColor;
 };
 
 #endif // PIECE_H

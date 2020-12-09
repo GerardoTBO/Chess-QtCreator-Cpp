@@ -8,8 +8,8 @@
 class Queen : public Piece{
     public:
         Queen();
-        Queen(int,int,QString,QString,QString,bool);
-        void wherePiece(Piece* casillas[8][8],bool,bool);
+        Queen(int,int,QString,bool);
+        void wherePiece(Piece* boxes[8][8],bool,bool);
         void addMovement(bool&,Piece*,int,int,bool);
 };
 

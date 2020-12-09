@@ -5,20 +5,22 @@
 #include <QPushButton>
 #include <QtWidgets>
 #include <QGridLayout>
-#include <string>
 #include <vector>
 #include <iostream>
 #include "piece.h"
 #include "pawn.h"
 #include "bishop.h"
-#include "horse.h"
+#include "knight.h"
 #include "king.h"
 #include "queen.h"
 #include "rook.h"
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+class ThreadTimer;
 
 class MainWindow : public QMainWindow
 {
@@ -27,20 +29,28 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
 public slots:
     void movePiece(int);
 
 private:
+    //Log
+    QString textLog = "";
+
     //Posiciones Guardadas
-    int posiciones[2]={-1,-1};
-    int posicionesWhiteCapture[2]={0,0};
-    int posicionesBlackCapture[2]={0,0};
+    int savedPosition[2]={-1,-1};
+    int positionsWhiteCapture[2]={0,0};
+    int positionsBlackCapture[2]={0,0};
     int turn = 1;
+
     //QPushButtons
-    Piece* casillas[8][8];
-    QLabel* whitePiecesEat[16];
-    QLabel* blackPiecesEat[16];
+    Piece* boxes[8][8];
+
+    QLabel* whitePiecesCapture[16];
+    QLabel* blackPiecesCapture[16];
+
+    ThreadTimer *timer;
+
+    void saveMove(int,int,int,int);
     void assingPieces();
     QSignalMapper* signalMapper = new QSignalMapper (this);
     void createPiece(int,int,bool,QString,QString);
@@ -48,6 +58,7 @@ private:
     void restartBackground(int,int);
     void assingColorBackground(int,int,bool);
     void addPieceCapture(QString,QString);
+    void restartTurn();
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H
