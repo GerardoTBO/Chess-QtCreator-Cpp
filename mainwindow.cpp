@@ -11,24 +11,17 @@ MainWindow::MainWindow(QWidget *parent)
     //Disable resize window
     this->setFixedSize(this->width(), this->height());
 
-    bool boxIsBlack=true;
-    for(int i=0;i<8;i++){
-        for(int j=0;j<8;j++){
-            createPiece(i,j,boxIsBlack,"","");
+    //Asignar casillas para piezas capturadas
+    assingPiecesCapture();
 
-            if(j!=7){
-                boxIsBlack=!boxIsBlack;
-            }
-        }
-    }
+    //Restaurar
+    restartGame();
+
     //Coneccion Final de los Slots
     connect (signalMapper, SIGNAL(mapped(int)), this, SLOT(movePiece(int)));
 
-    //Crea todas las piezas en sus respectivas posiciones y colores
-    assingPieces();
-
-    //Casillas de Pieza Capturadas
-    assingPiecesCapture();
+    //Agregar opciones en el menu
+    addOptionsMenu();
 
     //Inicializar tiempo de turnos
     timer = new ThreadTimer(this);
@@ -46,6 +39,35 @@ MainWindow::MainWindow(QWidget *parent)
         }
         ui->timeLabel->setText(QString::number(s/60)+":"+QString::number(s%60));
     });
+}
+void MainWindow::addOptionsMenu(){
+    ui->menuChessGame->addAction("Guardar Log", this, SLOT (saveLog()));
+    optionTemporizador = ui->menuChessGame->addAction("Desabilitar Timporizador", this, SLOT (changeTimer()));
+    ui->menuChessGame->addAction("Reiniciar Juego", this, SLOT(restartGame()));
+}
+
+void MainWindow::saveLog(){
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),"log.txt",tr("Chess Log (*.txt)"));
+    QFile file(fileName);
+    if ( file.open(QIODevice::ReadWrite) )
+    {
+        QTextStream stream( &file );
+        stream << textLog;
+    }
+}
+
+void MainWindow::changeTimer(){
+    flagTimer = !flagTimer;
+    if(flagTimer){
+        timer->pause();
+        optionTemporizador->setText("Habilitar Temporizador");
+        ui->timeLabel->setVisible(false);
+    }
+    else{
+        timer->play();
+        optionTemporizador->setText("Desabilitar Temporizador");
+        ui->timeLabel->setVisible(true);
+    }
 }
 
 void MainWindow::createPiece(int x,int y,bool boxIsBlack,QString type, QString color){
@@ -221,6 +243,40 @@ void MainWindow::assingPiecesCapture(){
         blackPiecesCapture[i]->setAlignment(Qt::AlignCenter);
         ui->captureBlackPiecesGrid->addWidget(blackPiecesCapture[i],x,y,Qt::AlignTop);
     }
+}
+
+void MainWindow::clearPiecesCapture(){
+    for(int i=0;i<16;i++){
+        whitePiecesCapture[i]->clear();
+        blackPiecesCapture[i]->clear();
+    }
+}
+
+void MainWindow::restartGame(){
+    //Variables
+    textLog = "";
+    savedPosition[0]=-1;
+    savedPosition[1]=-1;
+    positionsWhiteCapture=0;
+    positionsBlackCapture=0;
+    turn = 1;
+
+    //Crear Tablero vacio
+    bool boxIsBlack=true;
+    for(int i=0;i<8;i++){
+        for(int j=0;j<8;j++){
+            createPiece(i,j,boxIsBlack,"","");
+            if(j!=7){
+                boxIsBlack=!boxIsBlack;
+            }
+        }
+    }
+
+    //Crea todas las piezas en sus respectivas posiciones y colores
+    assingPieces();
+
+    //Limpiar Casillas de Pieza Capturadas
+    clearPiecesCapture();
 
 }
 

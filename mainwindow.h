@@ -31,7 +31,9 @@ public:
     ~MainWindow();
 public slots:
     void movePiece(int);
-
+    void saveLog();
+    void changeTimer();
+    void restartGame();
 private:
     //Log
     QString textLog = "";
@@ -50,7 +52,9 @@ private:
 
     //Bloqueo
     bool flagPromotion = false;
+    bool flagTimer = false;
 
+    QAction* optionTemporizador;
     ThreadTimer* timer;
     DialogPawnPromotion* dialogPromotion;
 
@@ -65,6 +69,8 @@ private:
     void restartTurn();
     void assingPiecesCapture();
     void promotion(int,int,QString);
+    void addOptionsMenu();
+    void clearPiecesCapture();
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

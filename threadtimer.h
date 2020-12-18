@@ -18,7 +18,7 @@ protected:
     void run();
 private:
     bool flagPromotion = false;
-    int defaultTime = 10;
+    int defaultTime = 180;
     int secondsTurn = 0;
     bool initialize = true;
 };
