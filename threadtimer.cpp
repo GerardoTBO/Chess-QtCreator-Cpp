@@ -14,11 +14,20 @@ void ThreadTimer::run(){
             secondsTurn = defaultTime;
             initialize = false;
         }
-        secondsTurn--;
-        emit seconds(secondsTurn);
+        if(!flagPromotion){
+            secondsTurn--;
+            emit seconds(secondsTurn);
+        }
         msleep(950);
     }
 }
 void ThreadTimer::reset(){
     initialize = true;
+}
+
+void ThreadTimer::play(){
+    flagPromotion = false;
+}
+void ThreadTimer::pause(){
+    flagPromotion = true;
 }

@@ -14,26 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
     bool boxIsBlack=true;
     for(int i=0;i<8;i++){
         for(int j=0;j<8;j++){
-            //            std::string temp;
-            //            switch(j)
-            //            {
-            //            case 0: temp=std::to_string(i+1)+"a";
-            //                break;
-            //            case 1: temp=std::to_string(i+1)+"b";
-            //                break;
-            //            case 2: temp=std::to_string(i+1)+"c";
-            //                break;
-            //            case 3: temp=std::to_string(i+1)+"d";
-            //                break;
-            //            case 4: temp=std::to_string(i+1)+"e";
-            //                break;
-            //            case 5: temp=std::to_string(i+1)+"f";
-            //                break;
-            //            case 6: temp=std::to_string(i+1)+"g";
-            //                break;
-            //            case 7: temp=std::to_string(i+1)+"h";
-            //                break;
-            //            }
             createPiece(i,j,boxIsBlack,"","");
 
             if(j!=7){
@@ -125,7 +105,7 @@ void MainWindow::movePiece(int c){
     int y = c%10;
 
     //Selecciona pieza a mover
-    if(boxes[x][y]->initialLetter.compare("")!=0 && ((boxes[x][y]->pieceColor.compare("white")==0 && turn%2==1) || (boxes[x][y]->pieceColor.compare("black")==0 && turn%2==0)) && savedPosition[0]==-1 && savedPosition[1]==-1){
+    if(!flagPromotion && boxes[x][y]->initialLetter.compare("")!=0 && ((boxes[x][y]->pieceColor.compare("white")==0 && turn%2==1) || (boxes[x][y]->pieceColor.compare("black")==0 && turn%2==0)) && savedPosition[0]==-1 && savedPosition[1]==-1){
         savedPosition[0]=x;
         savedPosition[1]=y;
         //Calcula las coordenadas donde se puede mover
@@ -134,14 +114,14 @@ void MainWindow::movePiece(int c){
     }
 
     //deseleccionar pieza
-    else if(savedPosition[0]==x && savedPosition[1]==y){
+    else if(!flagPromotion && savedPosition[0]==x && savedPosition[1]==y){
         restartBackground(x,y);
         savedPosition[0]=-1;
         savedPosition[1]=-1;
     }
 
     //Cambia de pieza a mover
-    else if(savedPosition[0]!=-1 && savedPosition[1]!=-1 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)==0){
+    else if(!flagPromotion && savedPosition[0]!=-1 && savedPosition[1]!=-1 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)==0){
         restartBackground(savedPosition[0],savedPosition[1]);
         savedPosition[0]=x;
         savedPosition[1]=y;
@@ -150,7 +130,7 @@ void MainWindow::movePiece(int c){
         changeBackground(x,y);
     }
 
-    else if(savedPosition[0]!=-1 && savedPosition[1]!=-1){
+    else if(!flagPromotion && savedPosition[0]!=-1 && savedPosition[1]!=-1){
         bool moveAccepted=false;
         //Itera en el vector de la piece casillas[posiciones[0]][posiciones[1] y verificar si se puede mover en esa nueva posicion
         for(std::size_t i=0;i<boxes[savedPosition[0]][savedPosition[1]]->possibleMovements.size();i++) {
@@ -179,11 +159,14 @@ void MainWindow::movePiece(int c){
             boxes[x][y]->wherePiece(boxes,true,true);
             //Limpia la anterior casillas
             createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
+            //Prueba de promocion
+            promotion(x,y,boxes[x][y]->pieceColor);
             //Reinicio de posiciones guardadas y aumento de contador de turnos
             savedPosition[0] = -1;
             savedPosition[1] = -1;
             turn++;
             timer->reset();
+
         }
     }
 
@@ -239,6 +222,19 @@ void MainWindow::assingPiecesCapture(){
         ui->captureBlackPiecesGrid->addWidget(blackPiecesCapture[i],x,y,Qt::AlignTop);
     }
 
+}
+
+void MainWindow::promotion(int x,int y, QString color){
+    timer->pause();
+    flagPromotion = true;
+    dialogPromotion = new DialogPawnPromotion(this);
+    dialogPromotion->createIcons(color);
+    dialogPromotion->exec();
+    //creacion de nueva pieza
+    createPiece(x,y,boxes[x][y]->backgroundColor,dialogPromotion->election,color);
+    //Desbloqueo
+    flagPromotion = false;
+    timer->play();
 }
 
 void MainWindow::assingPieces(){

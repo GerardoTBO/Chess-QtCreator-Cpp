@@ -14,7 +14,7 @@
 #include "king.h"
 #include "queen.h"
 #include "rook.h"
-
+#include "dialogpawnpromotion.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -48,7 +48,11 @@ private:
     QLabel* whitePiecesCapture[16];
     QLabel* blackPiecesCapture[16];
 
-    ThreadTimer *timer;
+    //Bloqueo
+    bool flagPromotion = false;
+
+    ThreadTimer* timer;
+    DialogPawnPromotion* dialogPromotion;
 
     void saveMove(int,int,int,int);
     void assingPieces();
@@ -60,6 +64,7 @@ private:
     void addPieceCapture(QString,QString);
     void restartTurn();
     void assingPiecesCapture();
+    void promotion(int,int,QString);
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

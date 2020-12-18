@@ -51,6 +51,9 @@ if(ANDROID)
     rook.h
     threadtimer.cpp
     threadtimer.h
+    dialogpawnpromotion.cpp
+    dialogpawnpromotion.h
+    dialogpawnpromotion.ui
   )
 else()
   add_executable(Chess-QtCreator-Cpp
@@ -76,6 +79,9 @@ else()
     rook.h
     threadtimer.cpp
     threadtimer.h
+    dialogpawnpromotion.cpp
+    dialogpawnpromotion.h
+    dialogpawnpromotion.ui
   )
 endif()
 
