@@ -38,8 +38,8 @@ private:
 
     //Posiciones Guardadas
     int savedPosition[2]={-1,-1};
-    int positionsWhiteCapture[2]={0,0};
-    int positionsBlackCapture[2]={0,0};
+    int positionsWhiteCapture=0;
+    int positionsBlackCapture=0;
     int turn = 1;
 
     //QPushButtons
@@ -59,6 +59,7 @@ private:
     void assingColorBackground(int,int,bool);
     void addPieceCapture(QString,QString);
     void restartTurn();
+    void assingPiecesCapture();
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

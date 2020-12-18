@@ -47,6 +47,9 @@ MainWindow::MainWindow(QWidget *parent)
     //Crea todas las piezas en sus respectivas posiciones y colores
     assingPieces();
 
+    //Casillas de Pieza Capturadas
+    assingPiecesCapture();
+
     //Inicializar tiempo de turnos
     timer = new ThreadTimer(this);
     timer->start();
@@ -187,34 +190,13 @@ void MainWindow::movePiece(int c){
 }
 
 void MainWindow::addPieceCapture(QString color, QString image){
-    if(color.compare("white")==0){
-        int posicionTemporal=positionsBlackCapture[0]*10+positionsBlackCapture[1];
-        blackPiecesCapture[posicionTemporal]=new QLabel();
-        blackPiecesCapture[posicionTemporal]->setStyleSheet("width: 30px;" "height:50px");
-        blackPiecesCapture[posicionTemporal]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,50)));
-        ui->captureBlackPiecesGrid->addWidget(blackPiecesCapture[posicionTemporal],positionsBlackCapture[0],positionsBlackCapture[1],Qt::AlignTop);
-//        ui->capture_black_pieces->addWidget(blackPiecesEat[posicionTemporal],posicionesBlackCapture[0],posicionesBlackCapture[1]);
-        if(positionsBlackCapture[1]<4){
-            positionsBlackCapture[1]++;
-        }
-        else{
-            positionsBlackCapture[1]=0;
-            positionsBlackCapture[0]++;
-        }
+    if(color.compare("black")==0){
+        blackPiecesCapture[positionsBlackCapture]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,50)));
+        positionsBlackCapture++;
     }
-    else if(color.compare("black")==0){
-        int posicionTemporal=positionsWhiteCapture[0]*10+positionsWhiteCapture[1];
-        whitePiecesCapture[posicionTemporal]=new QLabel();
-        whitePiecesCapture[posicionTemporal]->setStyleSheet("width: 30px;" "height:50px");
-        whitePiecesCapture[posicionTemporal]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,50)));
-        ui->captureWhitePiecesGrid->addWidget(whitePiecesCapture[posicionTemporal],positionsWhiteCapture[0],positionsWhiteCapture[1],Qt::AlignTop);
-        if(positionsWhiteCapture[1]<4){
-            positionsWhiteCapture[1]++;
-        }
-        else{
-            positionsWhiteCapture[1]=0;
-            positionsWhiteCapture[0]++;
-        }
+    else if(color.compare("white")==0){
+        whitePiecesCapture[positionsWhiteCapture]->setPixmap(QPixmap::fromImage(QImage(image).scaled(30,50)));
+        positionsWhiteCapture++;
     }
 }
 
@@ -239,6 +221,24 @@ void MainWindow::assingColorBackground(int x,int y,bool boxIsBlack){
     else{
         boxes[x][y]->setStyleSheet("background-color: #DFB082;" "width: 60px;" "height:60px");
     }
+}
+
+void MainWindow::assingPiecesCapture(){
+    for(int i=0;i<16;i++){
+        int x = i/4;
+        int y = i%4;
+
+        whitePiecesCapture[i]=new QLabel();
+        whitePiecesCapture[i]->setStyleSheet("width: 30px;" "height:50px;" "background-color:rgba( 255, 255, 255, 0%);" "border:none;");
+        whitePiecesCapture[i]->setAlignment(Qt::AlignCenter);
+        ui->captureWhitePiecesGrid->addWidget(whitePiecesCapture[i],x,y,Qt::AlignTop);
+
+        blackPiecesCapture[i]=new QLabel();
+        blackPiecesCapture[i]->setStyleSheet("width: 30px;" "height:50px;" "background-color:rgba( 255, 255, 255, 0%);" "border:none;");
+        blackPiecesCapture[i]->setAlignment(Qt::AlignCenter);
+        ui->captureBlackPiecesGrid->addWidget(blackPiecesCapture[i],x,y,Qt::AlignTop);
+    }
+
 }
 
 void MainWindow::assingPieces(){
