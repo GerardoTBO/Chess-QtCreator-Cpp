@@ -48,9 +48,9 @@ void Rook::wherePiece(Piece* boxes[8][8],bool firstIteracion,bool jakeCheck) {
         addMovement(directions[3],boxes[actualPosition.intX][y],actualPosition.intX,y,jakeCheck);
     }
 
-    std::for_each(possibleMovements.begin(), possibleMovements.end(), [](Coordinate i) {
-        qDebug() << "x: " << i.intX << ", y: " << i.intY << "\n";
-    });
+//    std::for_each(possibleMovements.begin(), possibleMovements.end(), [](Coordinate i) {
+//        qDebug() << "x: " << i.intX << ", y: " << i.intY << "\n";
+//    });
 }
 
 void Rook::addMovement(bool& d,Piece* p,int x,int y,bool jakeCheck){

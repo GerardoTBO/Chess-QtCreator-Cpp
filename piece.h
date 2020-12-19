@@ -7,9 +7,6 @@
 
 class Piece : public QPushButton
 {
-protected:
-    bool firstStep{true};
-
 public:
     Piece();
     Piece(QString,QString,bool);
@@ -19,7 +16,7 @@ public:
     virtual void wherePiece(Piece* boxes[8][8],bool,bool);
     void useFirsStep();
     void deleteElementFs(Coordinate);
-
+    bool firstStep{true};
     QString imageDirection = "";
     QString pieceColor = "";
     QString initialLetter = "";

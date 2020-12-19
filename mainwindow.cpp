@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     restartGame();
 
     //Coneccion Final de los Slots
-    connect (signalMapper, SIGNAL(mapped(int)), this, SLOT(movePiece(int)));
+    connect (signalMapper, SIGNAL(mapped(int)), this, SLOT(selectPiece(int)));
 
     //Agregar opciones en el menu
     addOptionsMenu();
@@ -121,7 +121,7 @@ void MainWindow::saveMove(int xO, int yO, int xF, int yF){
     qDebug() << textLog;
 }
 
-void MainWindow::movePiece(int c){
+void MainWindow::selectPiece(int c){
     //Calculo de posiciones por medio de c (i*10+j)
     int x = c/10;
     int y = c%10;
@@ -143,7 +143,7 @@ void MainWindow::movePiece(int c){
     }
 
     //Cambia de pieza a mover
-    else if(!flagPromotion && savedPosition[0]!=-1 && savedPosition[1]!=-1 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)==0){
+    else if(!flagPromotion && savedPosition[0]!=-1 && savedPosition[1]!=-1 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)==0 && !isCastling(x,y)){
         restartBackground(savedPosition[0],savedPosition[1]);
         savedPosition[0]=x;
         savedPosition[1]=y;
@@ -161,37 +161,90 @@ void MainWindow::movePiece(int c){
             }
         }
 
-        //Realiza el movimiento
+        //Pre movimiento
         if(moveAccepted){
-            //Guarda en el log
-            saveMove(savedPosition[0],savedPosition[1],x,y);
 
             //Limpia los background
             restartBackground(savedPosition[0],savedPosition[1]);
 
-            //Agrega la pieza capturada
-            if(boxes[x][y]->initialLetter.compare("")!=0 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)!=0){
-                addPieceCapture(boxes[x][y]->pieceColor,boxes[x][y]->imageDirection);
-            }
-            //Mueve la pieza a la nueva casilla
-            createPiece(x,y,boxes[x][y]->backgroundColor,boxes[savedPosition[0]][savedPosition[1]]->initialLetter,boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
-            //Marca la pieza como movida
-            boxes[x][y]->useFirsStep();
-            //Calcula si algun rey esta en jake
-            boxes[x][y]->wherePiece(boxes,true,true);
-            //Limpia la anterior casillas
-            createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
-            //Prueba de promocion
-            promotion(x,y,boxes[x][y]->pieceColor);
+            //Realiza movimiento
+            movePiece(x,y);
+
             //Reinicio de posiciones guardadas y aumento de contador de turnos
             savedPosition[0] = -1;
             savedPosition[1] = -1;
             turn++;
             timer->reset();
-
         }
     }
 
+}
+
+bool MainWindow::isCastling(int x, int y){
+    if(boxes[savedPosition[0]][savedPosition[1]]->firstStep && boxes[x][y]->initialLetter.compare("R")==0 && boxes[savedPosition[0]][savedPosition[1]]->initialLetter.compare("K")==0){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+void MainWindow::movePiece(int x,int y){
+    //Guarda en el log
+    saveMove(savedPosition[0],savedPosition[1],x,y);
+
+    //Agrega la pieza capturada
+    if(boxes[x][y]->initialLetter.compare("")!=0 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)!=0){
+        addPieceCapture(boxes[x][y]->pieceColor,boxes[x][y]->imageDirection);
+    }
+
+    //Calcula movimiento normales y especiales
+
+    //Peon promovido
+    if(boxes[savedPosition[0]][savedPosition[1]]->initialLetter.compare("P")==0 && ((boxes[savedPosition[0]][savedPosition[1]]->pieceColor.compare("white")==0 && x==7) || (boxes[savedPosition[0]][savedPosition[1]]->pieceColor.compare("black")==0 && x==0))){
+        promotion(x,y,boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
+        boxes[x][y]->useFirsStep();
+        createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
+    }
+    //Enroque
+    else if(isCastling(x,y)){
+        if(y<savedPosition[1]){
+            //Moviendo rey
+            createPiece(x,savedPosition[1]-2,boxes[x][savedPosition[1]-2]->backgroundColor,"K",boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
+            boxes[x][savedPosition[1]-2]->useFirsStep();
+            createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
+
+            //Moviendo torre
+            createPiece(x,y+3,boxes[x][y+3]->backgroundColor,"R",boxes[x][y]->pieceColor);
+            boxes[x][y+3]->useFirsStep();
+            createPiece(x,y,boxes[x][y]->backgroundColor,"","");
+        }
+        else{
+            //Moviendo rey
+            createPiece(x,savedPosition[1]+2,boxes[x][savedPosition[1]+2]->backgroundColor,"K",boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
+            boxes[x][savedPosition[1]+2]->useFirsStep();
+            createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
+
+            //Moviendo torre
+            createPiece(x,y-2,boxes[x][y-2]->backgroundColor,"R",boxes[x][y]->pieceColor);
+            boxes[x][y-2]->useFirsStep();
+            createPiece(x,y,boxes[x][y]->backgroundColor,"","");
+        }
+    }
+    //Movimiento Normal
+    else{
+        //Mueve la pieza a la nueva casilla
+        createPiece(x,y,boxes[x][y]->backgroundColor,boxes[savedPosition[0]][savedPosition[1]]->initialLetter,boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
+
+        //Marca la pieza como movida
+        boxes[x][y]->useFirsStep();
+
+        //Limpia la anterior casillas
+        createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
+    }
+
+    //Calcula si algun rey esta en jake
+    //boxes[x][y]->wherePiece(boxes,true,true);
 }
 
 void MainWindow::addPieceCapture(QString color, QString image){

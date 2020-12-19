@@ -30,7 +30,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 public slots:
-    void movePiece(int);
+    void selectPiece(int);
     void saveLog();
     void changeTimer();
     void restartGame();
@@ -71,6 +71,8 @@ private:
     void promotion(int,int,QString);
     void addOptionsMenu();
     void clearPiecesCapture();
+    void movePiece(int,int);
+    bool isCastling(int,int);
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H
