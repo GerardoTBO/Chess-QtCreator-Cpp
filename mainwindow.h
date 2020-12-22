@@ -101,6 +101,7 @@ private:
     void restartVariables();
     bool isCastling(int,int);
     void savePositionKing(int,int);
+    void deadPosition();
 
 };
 #endif // MAINWINDOW_H

@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QtDebug>
 #include "threadtimer.h"
@@ -187,6 +187,7 @@ void MainWindow::selectPiece(int c){
             savedPosition[1] = -1;
             turn++;
             timer->changeTurn();
+            deadPosition();
         }
     }
 
@@ -440,6 +441,58 @@ void MainWindow::resigningBlack(){
     QMessageBox::information(this,"Game Over","Jugador Negro se rindio");
     restartGame();
 }
+void MainWindow::deadPosition(){
+    int kings=0;
+    int blackBishopsBackgroundB=0;
+    int blackBishopsBackgroundW=0;
+    int whiteBishopsBackgroundB=0;
+    int whiteBishopsBackgroundW=0;
+    int knight=0;
+    int others=0;
+
+    for(int i=0;i<8;i++){
+        for(int j=0;j<8;j++){
+            if(boxes[i][j]->initialLetter.compare("K")==0){
+                kings++;
+            }
+            else if(boxes[i][j]->pieceColor.compare("white") && boxes[i][j]->initialLetter.compare("B")==0 && boxes[i][j]->backgroundColor){
+                whiteBishopsBackgroundB++;
+            }
+            else if(boxes[i][j]->pieceColor.compare("white") && boxes[i][j]->initialLetter.compare("B")==0 && !boxes[i][j]->backgroundColor){
+                whiteBishopsBackgroundW++;
+            }
+            else if(boxes[i][j]->pieceColor.compare("black") && boxes[i][j]->initialLetter.compare("B")==0 && boxes[i][j]->backgroundColor){
+                blackBishopsBackgroundB++;
+            }
+            else if(boxes[i][j]->pieceColor.compare("black") && boxes[i][j]->initialLetter.compare("B")==0 && !boxes[i][j]->backgroundColor){
+                blackBishopsBackgroundW++;
+            }
+            else if(boxes[i][j]->initialLetter.compare("N")==0){
+                knight++;
+            }
+            else if(boxes[i][j]->initialLetter.compare("")!=0){
+                others++;
+            }
+        }
+    }
+    if(kings==2 && (others+blackBishopsBackgroundB+blackBishopsBackgroundW+whiteBishopsBackgroundB+whiteBishopsBackgroundW+knight)==0){
+        QMessageBox::information(this,"Game Over","Posicion Muerta");
+        restartGame();
+    }
+    if(others==0 && kings==2 && (((blackBishopsBackgroundB+blackBishopsBackgroundW+whiteBishopsBackgroundB+whiteBishopsBackgroundW+knight)==1))){
+        QMessageBox::information(this,"Game Over","Posicion Muerta");
+        restartGame();
+    }
+    else if(others==0 && kings==2 && knight==0 && whiteBishopsBackgroundB==1 && blackBishopsBackgroundB==1 && whiteBishopsBackgroundW==0 && blackBishopsBackgroundW==0){
+        QMessageBox::information(this,"Game Over","Posicion Muerta");
+        restartGame();
+    }
+    else if(others==0 && kings==2 && knight==0 && whiteBishopsBackgroundB==0 && blackBishopsBackgroundB==0 && whiteBishopsBackgroundW==1 && blackBishopsBackgroundW==1){
+        QMessageBox::information(this,"Game Over","Posicion Muerta");
+        restartGame();
+    }
+}
+
 MainWindow::~MainWindow()
 {
     timer->terminate();
