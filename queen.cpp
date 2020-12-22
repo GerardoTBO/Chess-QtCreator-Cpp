@@ -11,25 +11,48 @@ Queen::Queen(int x, int y, QString pieceColor, bool backgroundColor) : Piece(pie
     this->imageDirection = "://pieces/"+pieceColor+"-queen.png";
 }
 
-void Queen::wherePiece(Piece* boxes[8][8],bool firstIteracion,bool jakeCheck) {
+void Queen::wherePiece(Piece* boxes[8][8],bool jakeCheck,QString lastMove,Coordinate king) {
     possibleMovements.clear();
     qDebug() << "Los elementos disponibles de la reina en la posicion ("<< actualPosition.intX << ", "<< actualPosition.intY << ") son\n";
-//    for (int x = 0; x < 8; x++) {
-//        for (int y = 0; y < 8; y++) {
-//            if( (((x < coor.int_x || x > coor.int_x) && y == coor.int_y)
-//                 || ((y < coor.int_y || y > coor.int_y) && x == coor.int_x))
-//                    || (abs(x-coor.int_x) == abs(y-coor.int_y)
-//                        && (coor.int_x != x && coor.int_y != y)) ) {
-//                pos.int_x = x;
-//                pos.int_y = y;
-//                fs.push_back(pos);
-//            }
-//        }
-//    }
 
     //Sentido del reloj
     //direcciones permitidas norte, noreste, este, sureste, sur, suroeste, oeste, noroeste
     bool directions[8] = {true, true, true, true, true, true, true, true};
+
+    int kingDirection = directionKingToPiece(boxes,king,actualPosition);
+
+    if((kingDirection==0 || kingDirection==4) && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[1] = false;
+        directions[2] = false;
+        directions[3] = false;
+        directions[5] = false;
+        directions[6] = false;
+        directions[7] = false;
+    }
+    else if((kingDirection==2 || kingDirection==6) && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[0] = false;
+        directions[1] = false;
+        directions[3] = false;
+        directions[4] = false;
+        directions[5] = false;
+        directions[7] = false;
+    }
+    else if((kingDirection==1 || kingDirection==5) && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[0] = false;
+        directions[2] = false;
+        directions[3] = false;
+        directions[4] = false;
+        directions[6] = false;
+        directions[7] = false;
+    }
+    else if((kingDirection==3 || kingDirection==7) && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[0] = false;
+        directions[1] = false;
+        directions[2] = false;
+        directions[4] = false;
+        directions[5] = false;
+        directions[6] = false;
+    }
 
     //Movimiemtos hacia el norte
     for(int x=actualPosition.intX+1; x<8 && directions[0]; x++){

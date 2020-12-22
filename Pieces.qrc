@@ -28,5 +28,8 @@
         <file>pieces/white-pawn.png</file>
         <file>pieces/white-queen.png</file>
         <file>pieces/white-rook.png</file>
+        <file>pieces/icon-program.png</file>
+        <file>pieces/blackFlag.png</file>
+        <file>pieces/whiteFlag.png</file>
     </qresource>
 </RCC>

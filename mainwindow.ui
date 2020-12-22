@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Tablero</string>
+   <string>Chess Game</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="Pieces.qrc">
+    <normaloff>:/pieces/icon-program.png</normaloff>:/pieces/icon-program.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">QMainWindow{
@@ -44,7 +48,7 @@ QLabel{
    <widget class="QLabel" name="whiteLabel">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>10</x>
       <y>20</y>
       <width>131</width>
       <height>61</height>
@@ -60,7 +64,7 @@ QLabel{
      </font>
     </property>
     <property name="cursor">
-     <cursorShape>SizeAllCursor</cursorShape>
+     <cursorShape>ArrowCursor</cursorShape>
     </property>
     <property name="mouseTracking">
      <bool>false</bool>
@@ -80,9 +84,9 @@ background-color: rgb(223,176,130,0.5);</string>
    <widget class="QLabel" name="blackLabel">
     <property name="geometry">
      <rect>
-      <x>870</x>
+      <x>900</x>
       <y>20</y>
-      <width>131</width>
+      <width>121</width>
       <height>61</height>
      </rect>
     </property>
@@ -480,9 +484,9 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
    <widget class="QLabel" name="timeLabel">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>420</x>
       <y>10</y>
-      <width>91</width>
+      <width>221</width>
       <height>21</height>
      </rect>
     </property>
@@ -495,7 +499,7 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
      </font>
     </property>
     <property name="text">
-     <string>00:00</string>
+     <string>Tiempo de Blanco: 00:00</string>
     </property>
     <property name="textFormat">
      <enum>Qt::PlainText</enum>
@@ -822,6 +826,50 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
      </item>
     </layout>
    </widget>
+   <widget class="QPushButton" name="resigningWhite">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>30</y>
+      <width>51</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton#resigningWhite{
+background-color: rgb(223,176,130,0.5);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="Pieces.qrc">
+      <normaloff>:/pieces/whiteFlag.png</normaloff>:/pieces/whiteFlag.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="resigningBlack">
+    <property name="geometry">
+     <rect>
+      <x>840</x>
+      <y>30</y>
+      <width>51</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton#resigningBlack{
+	background-color: rgb(84,12,11,0.5);
+}</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="Pieces.qrc">
+      <normaloff>:/pieces/blackFlag.png</normaloff>:/pieces/blackFlag.png</iconset>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -832,9 +880,37 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QMenuBar{
+	background-color: rgb(79, 79, 79);
+	
+	color: rgb(255, 255, 255);
+}</string>
+   </property>
    <widget class="QMenu" name="menuChessGame">
+    <property name="font">
+     <font>
+      <family>Nirmala UI</family>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QMenu{
+	background-color: rgb(129, 129, 129);
+}</string>
+    </property>
     <property name="title">
-     <string>Chess Game</string>
+     <string>Opciones</string>
     </property>
    </widget>
    <addaction name="menuChessGame"/>
@@ -845,6 +921,8 @@ font: 75 11pt &quot;DejaVu Sans&quot;;</string>
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="Pieces.qrc"/>
+ </resources>
  <connections/>
 </ui>

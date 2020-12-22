@@ -27,61 +27,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
+file(GLOB files "*.h" "*.cpp" "*.qrc" "*.ui") # files es nombre
+
 if(ANDROID)
   add_library(Chess-QtCreator-Cpp SHARED
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    piece.cpp
-    piece.h
-    pawn.cpp
-    pawn.h
-    Pieces.qrc
-    coordinate.h
-    bishop.cpp
-    bishop.h
-    knight.cpp
-    knight.h
-    king.cpp
-    king.h
-    queen.cpp
-    queen.h
-    rook.cpp
-    rook.h
-    threadtimer.cpp
-    threadtimer.h
-    dialogpawnpromotion.cpp
-    dialogpawnpromotion.h
-    dialogpawnpromotion.ui
+    ${files}
   )
 else()
   add_executable(Chess-QtCreator-Cpp
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    piece.cpp
-    piece.h
-    pawn.cpp
-    pawn.h
-    Pieces.qrc
-    coordinate.h
-    bishop.cpp
-    bishop.h
-    knight.cpp
-    knight.h
-    king.cpp
-    king.h
-    queen.cpp
-    queen.h
-    rook.cpp
-    rook.h
-    threadtimer.cpp
-    threadtimer.h
-    dialogpawnpromotion.cpp
-    dialogpawnpromotion.h
-    dialogpawnpromotion.ui
+    ${files}
   )
 endif()
 

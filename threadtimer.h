@@ -12,14 +12,17 @@ public:
     void reset();
     void play();
     void pause();
+    void changeTurn();
 signals:
     void seconds(int);
 protected:
     void run();
 private:
-    bool flagPromotion = false;
-    int defaultTime = 180;
-    int secondsTurn = 0;
+    bool flagGame = false;
+    int defaultTime = 2400;
+    int whiteTime = 0;
+    int blackTime = 0;
+    int turn = 1;
     bool initialize = true;
 };
 

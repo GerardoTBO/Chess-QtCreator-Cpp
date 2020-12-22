@@ -1,5 +1,6 @@
 #include "threadtimer.h"
 
+
 ThreadTimer::ThreadTimer(QObject *parent) : QThread(parent)
 {
 
@@ -11,12 +12,24 @@ ThreadTimer::~ThreadTimer(){
 void ThreadTimer::run(){
     while(true){
         if(initialize){
-            secondsTurn = defaultTime;
+            whiteTime = defaultTime;
+            blackTime = defaultTime;
             initialize = false;
         }
-        if(!flagPromotion){
-            secondsTurn--;
-            emit seconds(secondsTurn);
+        if(!flagGame){
+            if(turn%2==1){
+                if(whiteTime!=0){
+                    whiteTime--;
+                }
+                emit seconds(whiteTime);
+            }
+
+            else if(turn%2==0){
+                if(blackTime!=0){
+                    blackTime--;
+                }
+                emit seconds(blackTime);
+            }
         }
         msleep(950);
     }
@@ -24,10 +37,12 @@ void ThreadTimer::run(){
 void ThreadTimer::reset(){
     initialize = true;
 }
-
+void ThreadTimer::changeTurn(){
+    turn++;
+}
 void ThreadTimer::play(){
-    flagPromotion = false;
+    flagGame = false;
 }
 void ThreadTimer::pause(){
-    flagPromotion = true;
+    flagGame = true;
 }

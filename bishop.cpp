@@ -11,22 +11,30 @@ Bishop::Bishop(int x, int y, QString pieceColor, bool backgroundColor) : Piece(p
     this->imageDirection = "://pieces/"+pieceColor+"-bishop.png";
 }
 
-void Bishop::wherePiece(Piece* boxes[8][8],bool firstIteracion,bool jakeCheck) {
+void Bishop::wherePiece(Piece* boxes[8][8],bool jakeCheck,QString lastMove,Coordinate king) {
     possibleMovements.clear();
     qDebug() << "Los elementos disponibles del alfil en la posicion ("<< actualPosition.intX << ", "<< actualPosition.intY << ") son\n";
-//    for (int x = 0; x < 8; x++) {
-//        for (int y = 0; y < 8; y++) {
-//            if( abs(x-coor.int_x) == abs(y-coor.int_y) && (coor.int_x != x && coor.int_y != y) ) {
-//                pos.int_x = x;
-//                pos.int_y = y;
-//                fs.push_back(pos);
-//            }
-//        }
-//    }
 
     //Sentido del reloj
     //direcciones permitidas  noreste, sureste, suroeste, noroeste
     bool directions[4] = {true, true, true, true};
+
+    int kingDirection = directionKingToPiece(boxes,king,actualPosition);
+
+    if(kingDirection%2==0 && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[0] = false;
+        directions[1] = false;
+        directions[2] = false;
+        directions[3] = false;
+    }
+    else if((kingDirection==1 || kingDirection==5) && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[1] = false;
+        directions[3] = false;
+    }
+    else if((kingDirection==3 || kingDirection==7) && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[0] = false;
+        directions[2] = false;
+    }
 
     //Movimiemtos hacia noreste
     for(int x=actualPosition.intX+1, y=actualPosition.intY+1; x<8 && y<8 && directions[0]; x++, y++){
@@ -48,9 +56,6 @@ void Bishop::wherePiece(Piece* boxes[8][8],bool firstIteracion,bool jakeCheck) {
         addMovement(directions[3],boxes[x][y],x,y,jakeCheck);
     }
 
-//    std::for_each(possibleMovements.begin(), possibleMovements.end(), [](Coordinate i) {
-//        qDebug() << "x: " << i.intX << ", y: " << i.intY << "\n";
-//    });
 }
 
 void Bishop::addMovement(bool& d,Piece* p,int x,int y,bool jakeCheck){

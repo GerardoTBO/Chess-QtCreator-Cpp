@@ -11,22 +11,30 @@ Rook::Rook(int x, int y, QString pieceColor, bool backgroundColor) : Piece(piece
     this->imageDirection = "://pieces/"+pieceColor+"-rook.png";
 }
 
-void Rook::wherePiece(Piece* boxes[8][8],bool firstIteracion,bool jakeCheck) {
+void Rook::wherePiece(Piece* boxes[8][8],bool jakeCheck,QString lastMove,Coordinate king) {
     possibleMovements.clear();
     qDebug() << "Los elementos disponibles de la torre en la posicion ("<< actualPosition.intX << ", "<< actualPosition.intY << ") son\n";
-//    for (int x = 0; x < 8; x++) {
-//        for (int y = 0; y < 8; y++) {
-//            if( (x != coor.int_x && y == coor.int_y) || (y != coor.int_y && x == coor.int_x) ) {
-//                pos.int_x = x;
-//                pos.int_y = y;
-//                fs.push_back(pos);
-//            }
-//        }
-//    }
 
     //Sentido del reloj
     //direcciones permitidas norte, este, sur, oeste
     bool directions[4] = {true, true, true, true};
+
+    int kingDirection = directionKingToPiece(boxes,king,actualPosition);
+
+    if((kingDirection==0 || kingDirection==4) && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[1] = false;
+        directions[3] = false;
+    }
+    else if((kingDirection==2 || kingDirection==6) && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[0] = false;
+        directions[2] = false;
+    }
+    else if(kingDirection!=-1 && kingDirection%2==1 && verifiedPieceToEnemy(kingDirection,boxes,actualPosition)){
+        directions[0] = false;
+        directions[1] = false;
+        directions[2] = false;
+        directions[3] = false;
+    }
 
     //Movimiemtos hacia el norte
     for(int x=actualPosition.intX+1; x<8 && directions[0]; x++){
@@ -48,9 +56,6 @@ void Rook::wherePiece(Piece* boxes[8][8],bool firstIteracion,bool jakeCheck) {
         addMovement(directions[3],boxes[actualPosition.intX][y],actualPosition.intX,y,jakeCheck);
     }
 
-//    std::for_each(possibleMovements.begin(), possibleMovements.end(), [](Coordinate i) {
-//        qDebug() << "x: " << i.intX << ", y: " << i.intY << "\n";
-//    });
 }
 
 void Rook::addMovement(bool& d,Piece* p,int x,int y,bool jakeCheck){

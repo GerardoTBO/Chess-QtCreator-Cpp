@@ -11,6 +11,9 @@ MainWindow::MainWindow(QWidget *parent)
     //Disable resize window
     this->setFixedSize(this->width(), this->height());
 
+    builderPieces = new BuilderPieces(signalMapper,ui->boardGrid);
+    builderBoard = new BuilderBoard(builderPieces);
+
     //Asignar casillas para piezas capturadas
     assingPiecesCapture();
 
@@ -26,24 +29,60 @@ MainWindow::MainWindow(QWidget *parent)
     //Inicializar tiempo de turnos
     timer = new ThreadTimer(this);
     timer->start();
-    connect(timer, &ThreadTimer::seconds, [&](int s){
-        if(s==0){
-            timer->reset();
-            turn++;
-            if(savedPosition[0]!=-1 && savedPosition[1]!=-1){
-                restartBackground(savedPosition[0],savedPosition[1]);
-                savedPosition[0]=-1;
-                savedPosition[1]=-1;
-            }
-            textLog += "skipTurn ";
+
+    connect(timer,SIGNAL(seconds(int)),this,SLOT(controlTimer(int)));
+
+    connect(ui->resigningWhite,SIGNAL(clicked()),this,SLOT(resigningWhite()));
+    connect(ui->resigningBlack,SIGNAL(clicked()),this,SLOT(resigningBlack()));
+}
+
+void MainWindow::controlTimer(int s){
+    if(resetTimer){
+        timer->reset();
+        resetTimer = false;
+    }
+    else if(flagResetGame){
+        timer->pause();
+        restartGame();
+        flagResetGame = false;
+        timer->play();
+    }
+    else if(!flagGame && s==0 && turn%2==1){
+        flagGame=true;
+        QMessageBox::information(this,"Game Over","Jugador Blanco perdio por tiempo");
+        flagGame=false;
+        restartGame();
+    }
+    else if(!flagGame && s==0 && turn%2==0){
+        flagGame=true;
+        QMessageBox::information(this,"Game Over","Jugador Negro perdio por tiempo");
+        flagGame=false;
+        restartGame();
+    }
+    else if(turn%2==1){
+        if(s%60<10){
+            ui->timeLabel->setText("Tiempo de Blanco: "+QString::number(s/60)+":0"+QString::number(s%60));
         }
-        ui->timeLabel->setText(QString::number(s/60)+":"+QString::number(s%60));
-    });
+        else{
+            ui->timeLabel->setText("Tiempo de Blanco: "+QString::number(s/60)+":"+QString::number(s%60));
+        }
+
+    }
+    else if(turn%2==0){
+        if(s%60<10){
+            ui->timeLabel->setText("Tiempo de Negro: "+QString::number(s/60)+":0"+QString::number(s%60));
+        }
+        else{
+            ui->timeLabel->setText("Tiempo de Negro: "+QString::number(s/60)+":"+QString::number(s%60));
+        }
+
+    }
 }
 void MainWindow::addOptionsMenu(){
     ui->menuChessGame->addAction("Guardar Log", this, SLOT (saveLog()));
     optionTemporizador = ui->menuChessGame->addAction("Desabilitar Timporizador", this, SLOT (changeTimer()));
     ui->menuChessGame->addAction("Reiniciar Juego", this, SLOT(restartGame()));
+    ui->menuChessGame->addAction("Test",this,SLOT(testGame()));
 }
 
 void MainWindow::saveLog(){
@@ -70,55 +109,18 @@ void MainWindow::changeTimer(){
     }
 }
 
-void MainWindow::createPiece(int x,int y,bool boxIsBlack,QString type, QString color){
-    //    ui->gridLayout->removeWidget(casillas[x][y]);
-
-    //Creacion de piezas de algun tipo y asignacion de icono
-    if(type.compare("")==0){
-        boxes[x][y] = new Piece(color,"",boxIsBlack);
-    }
-    else if(type.compare("P")==0){
-        boxes[x][y] = new Pawn(x,y,color,boxIsBlack);
-    }
-    else if(type.compare("B")==0){
-        boxes[x][y] = new Bishop(x,y,color,boxIsBlack);
-    }
-    else if(type.compare("N")==0){
-        boxes[x][y] = new Knight(x,y,color,boxIsBlack);
-    }
-    else if(type.compare("R")==0){
-        boxes[x][y] = new Rook(x,y,color,boxIsBlack);
-    }
-    else if(type.compare("Q")==0){
-        boxes[x][y] = new Queen(x,y,color,boxIsBlack);
-    }
-    else if(type.compare("K")==0){
-        boxes[x][y] = new King(x,y,color,boxIsBlack);
-    }
-    boxes[x][y]->setIcon(QIcon(boxes[x][y]->imageDirection));
-    boxes[x][y]->setIconSize(QSize(40,40));
-
-    //Color del casilllero
-    assingColorBackground(x,y,boxIsBlack);
-
-    //Agregar elementos a gridlayout
-    ui->boardGrid->addWidget(boxes[x][y],7-x,y);
-
-    //Coneccion de eventos a Piece's
-    connect (boxes[x][y], SIGNAL(clicked()), signalMapper, SLOT(map()));
-    signalMapper -> setMapping (boxes[x][y], x*10+y);
-}
-
 void MainWindow::saveMove(int xO, int yO, int xF, int yF){
     //Agrega la posiciones inicial de la pieza movida
-    textLog += boxes[xO][yO]->initialLetter + QString::number(xO) + QString::number(yO);
+    lastMove = boxes[xO][yO]->initialLetter + QString::number(xO) + QString::number(yO);
     //Agrega x si se capturo una pieza enemiga
     if(boxes[xF][yF]->initialLetter.compare("")!=0){
-        textLog += "x";
+        lastMove += "x";
     }
     //Agrega la posicion final de la pieza movida y un salto de linea
-    textLog += QString::number(xF) + QString::number(yO) + " ";
+    lastMove += QString::number(xF) + QString::number(yO);
+    textLog += lastMove + "\n";
     qDebug() << textLog;
+
 }
 
 void MainWindow::selectPiece(int c){
@@ -127,32 +129,42 @@ void MainWindow::selectPiece(int c){
     int y = c%10;
 
     //Selecciona pieza a mover
-    if(!flagPromotion && boxes[x][y]->initialLetter.compare("")!=0 && ((boxes[x][y]->pieceColor.compare("white")==0 && turn%2==1) || (boxes[x][y]->pieceColor.compare("black")==0 && turn%2==0)) && savedPosition[0]==-1 && savedPosition[1]==-1){
+    if(!flagGame && boxes[x][y]->initialLetter.compare("")!=0 && ((boxes[x][y]->pieceColor.compare("white")==0 && turn%2==1) || (boxes[x][y]->pieceColor.compare("black")==0 && turn%2==0)) && savedPosition[0]==-1 && savedPosition[1]==-1){
         savedPosition[0]=x;
         savedPosition[1]=y;
         //Calcula las coordenadas donde se puede mover
-        boxes[x][y]->wherePiece(boxes,true,false);
+        if(turn%2==1){
+            boxes[x][y]->wherePiece(boxes,checkWhite,lastMove,positionWhiteKing);
+        }
+        else{
+            boxes[x][y]->wherePiece(boxes,checkBlack,lastMove,positionBlackKing);
+        }
         changeBackground(x,y);
     }
 
     //deseleccionar pieza
-    else if(!flagPromotion && savedPosition[0]==x && savedPosition[1]==y){
+    else if(!flagGame && savedPosition[0]==x && savedPosition[1]==y){
         restartBackground(x,y);
         savedPosition[0]=-1;
         savedPosition[1]=-1;
     }
 
     //Cambia de pieza a mover
-    else if(!flagPromotion && savedPosition[0]!=-1 && savedPosition[1]!=-1 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)==0 && !isCastling(x,y)){
+    else if(!flagGame && savedPosition[0]!=-1 && savedPosition[1]!=-1 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)==0 && !isCastling(x,y)){
         restartBackground(savedPosition[0],savedPosition[1]);
         savedPosition[0]=x;
         savedPosition[1]=y;
         //Calcula las coordenadas donde se puede mover
-        boxes[x][y]->wherePiece(boxes,true,false);
+        if(turn%2==1){
+            boxes[x][y]->wherePiece(boxes,checkWhite,lastMove,positionWhiteKing);
+        }
+        else{
+            boxes[x][y]->wherePiece(boxes,checkBlack,lastMove,positionBlackKing);
+        }
         changeBackground(x,y);
     }
 
-    else if(!flagPromotion && savedPosition[0]!=-1 && savedPosition[1]!=-1){
+    else if(!flagGame && savedPosition[0]!=-1 && savedPosition[1]!=-1){
         bool moveAccepted=false;
         //Itera en el vector de la piece casillas[posiciones[0]][posiciones[1] y verificar si se puede mover en esa nueva posicion
         for(std::size_t i=0;i<boxes[savedPosition[0]][savedPosition[1]]->possibleMovements.size();i++) {
@@ -174,7 +186,7 @@ void MainWindow::selectPiece(int c){
             savedPosition[0] = -1;
             savedPosition[1] = -1;
             turn++;
-            timer->reset();
+            timer->changeTurn();
         }
     }
 
@@ -190,57 +202,98 @@ bool MainWindow::isCastling(int x, int y){
 }
 
 void MainWindow::movePiece(int x,int y){
-    //Guarda en el log
-    saveMove(savedPosition[0],savedPosition[1],x,y);
 
-    //Agrega la pieza capturada
+    //Agrega la pieza capturada de forma normal y comprueba si es un rey o no
     if(boxes[x][y]->initialLetter.compare("")!=0 && boxes[x][y]->pieceColor.compare(boxes[savedPosition[0]][savedPosition[1]]->pieceColor)!=0){
         addPieceCapture(boxes[x][y]->pieceColor,boxes[x][y]->imageDirection);
+        if(boxes[x][y]->initialLetter.compare("K")==0 && turn%2==1){
+            flagGame=true;
+            QMessageBox::information(this,"Game Over","Jugador Blanco gana");
+            flagResetGame=true;
+            flagGame=false;
+        }
+        else if(boxes[x][y]->initialLetter.compare("K")==0 && turn%2==0){
+            flagGame=true;
+            QMessageBox::information(this,"Game Over","Jugador Negro gana");
+            flagResetGame=true;
+            flagGame=false;
+        }
     }
 
     //Calcula movimiento normales y especiales
 
     //Peon promovido
     if(boxes[savedPosition[0]][savedPosition[1]]->initialLetter.compare("P")==0 && ((boxes[savedPosition[0]][savedPosition[1]]->pieceColor.compare("white")==0 && x==7) || (boxes[savedPosition[0]][savedPosition[1]]->pieceColor.compare("black")==0 && x==0))){
-        promotion(x,y,boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
+        //Guarda en el log
+        saveMove(savedPosition[0],savedPosition[1],x,y);
+        if(!flagResetGame){
+            promotion(x,y,boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
+        }
         boxes[x][y]->useFirsStep();
-        createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
+        builderPieces->createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","",boxes);
+
+    }
+    //Peon Pasando
+    else if(boxes[savedPosition[0]][savedPosition[1]]->initialLetter.compare("P")==0 && boxes[x][y]->initialLetter.compare("")==0 && savedPosition[1]!=y){
+        if(boxes[savedPosition[0]][savedPosition[1]]->pieceColor.compare("white")==0){
+            addPieceCapture(boxes[x-1][y]->pieceColor,boxes[x-1][y]->imageDirection);
+            //Moviendo peon que esta pasando
+            builderPieces->createPiece(x,y,boxes[x][y]->backgroundColor,"P",boxes[savedPosition[0]][savedPosition[1]]->pieceColor,boxes);
+            //Limpiando casilla de donde viene el peon
+            builderPieces->createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","",boxes);
+            //Limpiando el lugar donde estaba el peon sobre el que se paso
+            builderPieces->createPiece(x-1,y,boxes[x-1][y]->backgroundColor,"","",boxes);
+            boxes[x][y]->useFirsStep();
+        }
+        else{
+            addPieceCapture(boxes[x+1][y]->pieceColor,boxes[x+1][y]->imageDirection);
+            builderPieces->createPiece(x,y,boxes[x][y]->backgroundColor,"P",boxes[savedPosition[0]][savedPosition[1]]->pieceColor,boxes);
+            builderPieces->createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","",boxes);
+            builderPieces->createPiece(x+1,y,boxes[x+1][y]->backgroundColor,"","",boxes);
+            boxes[x][y]->useFirsStep();
+        }
     }
     //Enroque
     else if(isCastling(x,y)){
         if(y<savedPosition[1]){
             //Moviendo rey
-            createPiece(x,savedPosition[1]-2,boxes[x][savedPosition[1]-2]->backgroundColor,"K",boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
+            builderPieces->createPiece(x,savedPosition[1]-2,boxes[x][savedPosition[1]-2]->backgroundColor,"K",boxes[savedPosition[0]][savedPosition[1]]->pieceColor,boxes);
+            builderPieces->createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","",boxes);
             boxes[x][savedPosition[1]-2]->useFirsStep();
-            createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
-
             //Moviendo torre
-            createPiece(x,y+3,boxes[x][y+3]->backgroundColor,"R",boxes[x][y]->pieceColor);
+            builderPieces->createPiece(x,y+3,boxes[x][y+3]->backgroundColor,"R",boxes[x][y]->pieceColor,boxes);
+            builderPieces->createPiece(x,y,boxes[x][y]->backgroundColor,"","",boxes);
             boxes[x][y+3]->useFirsStep();
-            createPiece(x,y,boxes[x][y]->backgroundColor,"","");
+            textLog += "0-0-0\n";
         }
         else{
             //Moviendo rey
-            createPiece(x,savedPosition[1]+2,boxes[x][savedPosition[1]+2]->backgroundColor,"K",boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
+            builderPieces->createPiece(x,savedPosition[1]+2,boxes[x][savedPosition[1]+2]->backgroundColor,"K",boxes[savedPosition[0]][savedPosition[1]]->pieceColor,boxes);
+            builderPieces->createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","",boxes);
             boxes[x][savedPosition[1]+2]->useFirsStep();
-            createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
-
             //Moviendo torre
-            createPiece(x,y-2,boxes[x][y-2]->backgroundColor,"R",boxes[x][y]->pieceColor);
+            builderPieces->createPiece(x,y-2,boxes[x][y-2]->backgroundColor,"R",boxes[x][y]->pieceColor,boxes);
+            builderPieces->createPiece(x,y,boxes[x][y]->backgroundColor,"","",boxes);
             boxes[x][y-2]->useFirsStep();
-            createPiece(x,y,boxes[x][y]->backgroundColor,"","");
+            textLog += "0-0\n";
         }
     }
     //Movimiento Normal
     else{
+        //Guarda en el log
+        saveMove(savedPosition[0],savedPosition[1],x,y);
+
         //Mueve la pieza a la nueva casilla
-        createPiece(x,y,boxes[x][y]->backgroundColor,boxes[savedPosition[0]][savedPosition[1]]->initialLetter,boxes[savedPosition[0]][savedPosition[1]]->pieceColor);
+        builderPieces->createPiece(x,y,boxes[x][y]->backgroundColor,boxes[savedPosition[0]][savedPosition[1]]->initialLetter,boxes[savedPosition[0]][savedPosition[1]]->pieceColor,boxes);
+
+        //Limpia la anterior casillas
+        builderPieces->createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","",boxes);
 
         //Marca la pieza como movida
         boxes[x][y]->useFirsStep();
 
-        //Limpia la anterior casillas
-        createPiece(savedPosition[0],savedPosition[1],boxes[savedPosition[0]][savedPosition[1]]->backgroundColor,"","");
+        //Si es rey guarda su posicion actual
+        savePositionKing(x,y);
     }
 
     //Calcula si algun rey esta en jake
@@ -266,18 +319,24 @@ void MainWindow::changeBackground(int x,int y){
 }
 
 void MainWindow::restartBackground(int x,int y){
-    assingColorBackground(x,y,boxes[x][y]->backgroundColor);
+    builderPieces->assingColorBackground(boxes[x][y]->backgroundColor,boxes[x][y]);
     for(std::size_t i=0;i<boxes[x][y]->possibleMovements.size();i++) {
-        assingColorBackground(boxes[x][y]->possibleMovements[i].intX,boxes[x][y]->possibleMovements[i].intY,boxes[boxes[x][y]->possibleMovements[i].intX][boxes[x][y]->possibleMovements[i].intY]->backgroundColor);
+        int pX = boxes[x][y]->possibleMovements[i].intX;
+        int pY = boxes[x][y]->possibleMovements[i].intY;
+        builderPieces->assingColorBackground(boxes[pX][pY]->backgroundColor,boxes[pX][pY]);
     }
 }
 
-void MainWindow::assingColorBackground(int x,int y,bool boxIsBlack){
-    if(boxIsBlack){
-        boxes[x][y]->setStyleSheet("background-color: #540C0B;" "width: 60px;" "height:60px");
+void MainWindow::savePositionKing(int x,int y){
+    if(boxes[x][y]->initialLetter.compare("K")==0 && turn%2==1){
+        positionWhiteKing.intX = x;
+        positionWhiteKing.intY = y;
+        qDebug() << "W x: "<< positionWhiteKing.intX << " y: " << positionWhiteKing.intY << "\n";
     }
-    else{
-        boxes[x][y]->setStyleSheet("background-color: #DFB082;" "width: 60px;" "height:60px");
+    else if(boxes[x][y]->initialLetter.compare("K")==0 && turn%2==0){
+        positionBlackKing.intX = x;
+        positionBlackKing.intY = y;
+        qDebug() << "B x: "<< positionBlackKing.intX << " y: " << positionBlackKing.intY << "\n";
     }
 }
 
@@ -304,21 +363,31 @@ void MainWindow::clearPiecesCapture(){
         blackPiecesCapture[i]->clear();
     }
 }
-
-void MainWindow::restartGame(){
+void MainWindow::restartVariables(){
     //Variables
+    resetTimer = true;
     textLog = "";
     savedPosition[0]=-1;
     savedPosition[1]=-1;
     positionsWhiteCapture=0;
     positionsBlackCapture=0;
     turn = 1;
+    //Coordenadas actual de los reyes
+    positionWhiteKing.intX = 0;
+    positionWhiteKing.intY = 4;
+
+    positionBlackKing.intX = 7;
+    positionBlackKing.intY = 4;
+}
+
+void MainWindow::restartGame(){
+    restartVariables();
 
     //Crear Tablero vacio
     bool boxIsBlack=true;
     for(int i=0;i<8;i++){
         for(int j=0;j<8;j++){
-            createPiece(i,j,boxIsBlack,"","");
+            builderPieces->createPiece(i,j,boxIsBlack,"","",boxes);
             if(j!=7){
                 boxIsBlack=!boxIsBlack;
             }
@@ -326,68 +395,54 @@ void MainWindow::restartGame(){
     }
 
     //Crea todas las piezas en sus respectivas posiciones y colores
-    assingPieces();
+    builderBoard->assingPieces(boxes,"reset");
 
     //Limpiar Casillas de Pieza Capturadas
     clearPiecesCapture();
 
 }
 
+void MainWindow::testGame(){
+    restartVariables();
+
+    //Crear Tablero vacio
+    bool boxIsBlack=true;
+    for(int i=0;i<8;i++){
+        for(int j=0;j<8;j++){
+            builderPieces->createPiece(i,j,boxIsBlack,"","",boxes);
+            if(j!=7){
+                boxIsBlack=!boxIsBlack;
+            }
+        }
+    }
+    builderBoard->assingPieces(boxes,"test");
+    clearPiecesCapture();
+}
 void MainWindow::promotion(int x,int y, QString color){
     timer->pause();
-    flagPromotion = true;
+    flagGame = true;
     dialogPromotion = new DialogPawnPromotion(this);
     dialogPromotion->createIcons(color);
     dialogPromotion->exec();
     //creacion de nueva pieza
-    createPiece(x,y,boxes[x][y]->backgroundColor,dialogPromotion->election,color);
+    builderPieces->createPiece(x,y,boxes[x][y]->backgroundColor,dialogPromotion->election,color,boxes);
+    //guardar log
+    textLog += QString::number(x)+QString::number(y)+dialogPromotion->election+"\n";
     //Desbloqueo
-    flagPromotion = false;
+    flagGame = false;
     timer->play();
 }
-
-void MainWindow::assingPieces(){
-    //Piezas Blancas
-    createPiece(0,0,true,"R","white");
-    createPiece(0,1,false,"N","white");
-    createPiece(0,2,true,"B","white");
-    createPiece(0,3,false,"Q","white");
-    createPiece(0,4,true,"K","white");
-    createPiece(0,5,false,"B","white");
-    createPiece(0,6,true,"N","white");
-    createPiece(0,7,false,"R","white");
-
-    createPiece(1,0,false,"P","white");
-    createPiece(1,1,true,"P","white");
-    createPiece(1,2,false,"P","white");
-    createPiece(1,3,true,"P","white");
-    createPiece(1,4,false,"P","white");
-    createPiece(1,5,true,"P","white");
-    createPiece(1,6,false,"P","white");
-    createPiece(1,7,true,"P","white");
-
-    //Piezas Negras
-    createPiece(7,0,false,"R","black");
-    createPiece(7,1,true,"N","black");
-    createPiece(7,2,false,"B","black");
-    createPiece(7,3,true,"Q","black");
-    createPiece(7,4,false,"K","black");
-    createPiece(7,5,true,"B","black");
-    createPiece(7,6,false,"N","black");
-    createPiece(7,7,true,"R","black");
-
-    createPiece(6,0,true,"P","black");
-    createPiece(6,1,false,"P","black");
-    createPiece(6,2,true,"P","black");
-    createPiece(6,3,false,"P","black");
-    createPiece(6,4,true,"P","black");
-    createPiece(6,5,false,"P","black");
-    createPiece(6,6,true,"P","black");
-    createPiece(6,7,false,"P","black");
+void MainWindow::resigningWhite(){
+    QMessageBox::information(this,"Game Over","Jugador Blanco se rindio");
+    restartGame();
 }
-
+void MainWindow::resigningBlack(){
+    QMessageBox::information(this,"Game Over","Jugador Negro se rindio");
+    restartGame();
+}
 MainWindow::~MainWindow()
 {
+    timer->terminate();
     delete ui;
 }
 
